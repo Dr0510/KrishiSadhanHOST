@@ -101,18 +101,20 @@ export function MapView({
     }
   }, [equipment, viewMode]);
   
-  // Add a specialized effect for checking coordinate changes
+  // Add a specialized effect for checking location and coordinate changes
   useEffect(() => {
-    // This effect specifically watches for coordinate changes in equipment
-    const coordinatesChanged = equipment.some(item => 
-      item.latitudeCoord || item.longitudeCoord
-    );
+    // Create a "fingerprint" of equipment locations that includes both city locations and coordinates
+    const locationFingerprint = equipment.map(item => 
+      `${item.id}-${item.location}-${item.latitudeCoord}-${item.longitudeCoord}`
+    ).join('|');
     
-    if (coordinatesChanged && viewMode === 'map') {
-      console.log("Equipment coordinates changed, refreshing map");
+    // Force map refresh when any equipment's location or coordinates change
+    if (viewMode === 'map') {
+      console.log("Checking equipment location changes");
       setMapKey(prev => prev + 1);
+      setIsMapLoading(true);
     }
-  }, [equipment.map(item => `${item.id}-${item.latitudeCoord}-${item.longitudeCoord}`).join(','), viewMode]);
+  }, [equipment.map(item => `${item.id}-${item.location}-${item.latitudeCoord}-${item.longitudeCoord}`).join('|'), viewMode]);
 
   const createCustomIcon = useCallback((dailyRate: number) => {
     return L.divIcon({

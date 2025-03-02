@@ -205,10 +205,10 @@ export function registerRoutes(app: Express): Server {
 
       // Clean and format location string
       const location = req.body.location?.toLowerCase().trim();
-      
+
       // Handle custom coordinates if provided
       let coordinates = null;
-      
+
       // First check if direct coordinates were provided
       if (req.body.latitudeCoord && req.body.longitudeCoord) {
         const lat = parseFloat(req.body.latitudeCoord);
@@ -218,29 +218,29 @@ export function registerRoutes(app: Express): Server {
           console.log('Using custom coordinates from form:', coordinates);
         }
       }
-      
+
       // If no direct coordinates, try to find from city map
       if (!coordinates && location) {
         // Normalize location for comparison
         const normalizedLocation = location.toLowerCase().trim();
-        
+
         // Try different location formats in the city map
         coordinates = cityCoordinates[normalizedLocation] || 
                       cityCoordinates[normalizedLocation.replace('.', '')] || // Try without period
                       cityCoordinates[normalizedLocation.replace(' ', '')] || // Try without space
                       null;
-                      
+
         if (coordinates) {
           console.log('Found coordinates for location:', location, coordinates);
         } else {
           console.log('No coordinates found for location:', location);
-          
+
           // If location is provided but no coordinates found, try more thorough matching
           if (location && location.length > 0) {
             // Try a fuzzy match with cityCoordinates keys
             let bestMatch = '';
             let maxSimilarity = 0;
-            
+
             Object.keys(cityCoordinates).forEach(city => {
               // Check if location contains city name or vice versa
               if (city.includes(normalizedLocation) || normalizedLocation.includes(city)) {
@@ -252,7 +252,7 @@ export function registerRoutes(app: Express): Server {
                 }
               }
             });
-            
+
             if (bestMatch && maxSimilarity > 0.5) {
               coordinates = cityCoordinates[bestMatch];
               console.log(`Found fuzzy match for "${location}": "${bestMatch}"`, coordinates);
@@ -267,7 +267,7 @@ export function registerRoutes(app: Express): Server {
                   break;
                 }
               }
-              
+
               // If still no coordinates, use default
               if (!coordinates) {
                 coordinates = [20.5937, 78.9629]; // Default to center of India
@@ -391,72 +391,77 @@ export function registerRoutes(app: Express): Server {
         updateData.dailyRate = parseInt(req.body.dailyRate);
       }
 
-      // Update coordinates if location changed
-      if (req.body.location) {
-        const cityCoordinates = {
-          'pune': [18.5204, 73.8567],
-          'mumbai': [19.0760, 72.8777],
-          'delhi': [28.6139, 77.2090],
-          'bangalore': [12.9716, 77.5946],
-          'hyderabad': [17.3850, 78.4867],
-          'chennai': [13.0827, 80.2707],
-          'kolkata': [22.5726, 88.3639],
-          'ahmedabad': [23.0225, 72.5714],
-          'latur': [18.4088, 76.5604],
-          'nilanga': [18.1177, 76.7506],
-          'aurangabad': [19.8762, 75.3433],
-          'chh. sambhajinagar': [19.8762, 75.3433],
-          'nagpur': [21.1458, 79.0882],
-          'nashik': [19.9975, 73.7898],
-          'barshi': [18.2333, 75.6833],
-        };
-        
+      // Always update coordinates when equipment is modified
+      const cityCoordinates = {
+        'pune': [18.5204, 73.8567],
+        'mumbai': [19.0760, 72.8777],
+        'delhi': [28.6139, 77.2090],
+        'bangalore': [12.9716, 77.5946],
+        'hyderabad': [17.3850, 78.4867],
+        'chennai': [13.0827, 80.2707],
+        'kolkata': [22.5726, 88.3639],
+        'ahmedabad': [23.0225, 72.5714],
+        'latur': [18.4088, 76.5604],
+        'nilanga': [18.1177, 76.7506],
+        'aurangabad': [19.8762, 75.3433],
+        'chh. sambhajinagar': [19.8762, 75.3433],
+        'nagpur': [21.1458, 79.0882],
+        'nashik': [19.9975, 73.7898],
+        'barshi': [18.2333, 75.6833],
+      };
+
+      // First check if direct coordinates were provided (highest priority)
+      if (req.body.latitudeCoord && req.body.longitudeCoord) {
+        const lat = parseFloat(req.body.latitudeCoord);
+        const lng = parseFloat(req.body.longitudeCoord);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          updateData.latitudeCoord = lat.toString();
+          updateData.longitudeCoord = lng.toString();
+          console.log('Updating with custom coordinates:', [lat, lng]);
+        }
+      } 
+      // If location changed but no coordinates provided, try to determine from location
+      else if (req.body.location) {
         const location = req.body.location.toLowerCase().trim();
-        
-        // First check if direct coordinates were provided
-        if (req.body.latitudeCoord && req.body.longitudeCoord) {
-          const lat = parseFloat(req.body.latitudeCoord);
-          const lng = parseFloat(req.body.longitudeCoord);
-          if (!isNaN(lat) && !isNaN(lng)) {
-            updateData.latitudeCoord = lat.toString();
-            updateData.longitudeCoord = lng.toString();
-            console.log('Updating with custom coordinates:', [lat, lng]);
-          }
+
+        // Try to find from city map
+        const coordinates = cityCoordinates[location] || 
+                          cityCoordinates[location.replace('.', '')] || 
+                          cityCoordinates[location.replace(' ', '')] || 
+                          null;
+
+        if (coordinates) {
+          updateData.latitudeCoord = coordinates[0].toString();
+          updateData.longitudeCoord = coordinates[1].toString();
+          console.log('Updated coordinates for location:', location, coordinates);
         } else {
-          // Try to find from city map
-          const coordinates = cityCoordinates[location] || 
-                            cityCoordinates[location.replace('.', '')] || 
-                            cityCoordinates[location.replace(' ', '')] || 
-                            null;
-                            
-          if (coordinates) {
-            updateData.latitudeCoord = coordinates[0].toString();
-            updateData.longitudeCoord = coordinates[1].toString();
-            console.log('Updated coordinates for location:', location, coordinates);
-          } else {
-            console.log('No coordinates found for location:', location);
-            
-            // Try fuzzy matching for better location mapping
-            let bestMatch = '';
-            let maxSimilarity = 0;
-            
-            Object.keys(cityCoordinates).forEach(city => {
-              if (city.includes(location) || location.includes(city)) {
-                const similarity = Math.min(city.length, location.length) / 
-                                  Math.max(city.length, location.length);
-                if (similarity > maxSimilarity) {
-                  maxSimilarity = similarity;
-                  bestMatch = city;
-                }
+          console.log('No coordinates found for location:', location);
+
+          // Try fuzzy matching for better location mapping
+          let bestMatch = '';
+          let maxSimilarity = 0;
+
+          Object.keys(cityCoordinates).forEach(city => {
+            if (city.includes(location) || location.includes(city)) {
+              const similarity = Math.min(city.length, location.length) / 
+                                Math.max(city.length, location.length);
+              if (similarity > maxSimilarity) {
+                maxSimilarity = similarity;
+                bestMatch = city;
               }
-            });
-            
-            if (bestMatch && maxSimilarity > 0.5) {
-              const fuzzyCoordinates = cityCoordinates[bestMatch];
-              updateData.latitudeCoord = fuzzyCoordinates[0].toString();
-              updateData.longitudeCoord = fuzzyCoordinates[1].toString();
-              console.log(`Found fuzzy match for "${location}": "${bestMatch}"`, fuzzyCoordinates);
             }
+          });
+
+          if (bestMatch && maxSimilarity > 0.5) {
+            const fuzzyCoordinates = cityCoordinates[bestMatch];
+            updateData.latitudeCoord = fuzzyCoordinates[0].toString();
+            updateData.longitudeCoord = fuzzyCoordinates[1].toString();
+            console.log(`Found fuzzy match for "${location}": "${bestMatch}"`, fuzzyCoordinates);
+          } else {
+            // If all else fails, set default coordinates for center of India
+            updateData.latitudeCoord = "20.5937";
+            updateData.longitudeCoord = "78.9629";
+            console.log('Using default coordinates for unknown location:', location);
           }
         }
       }
@@ -860,7 +865,7 @@ export function registerRoutes(app: Express): Server {
         return res.status(404).json({ error: "Receipt not found" });
       }
 
-      // Check if the receipt belongs to the authenticated user
+            // Check if the receipt belongs to the authenticated user
       if (receipt.userId !== req.user.id) {
         return res.status(403).json({ error: "Not authorized to access this receipt" });
       }
@@ -884,7 +889,7 @@ export function registerRoutes(app: Express): Server {
       if (isNaN(bookingId)) {
         return res.status(400).json({ error: "Invalid booking ID" });
       }
-      
+
       const booking = await storage.getBooking(bookingId);
       if (!booking) {
         return res.status(404).json({ error: "Booking not found" });
