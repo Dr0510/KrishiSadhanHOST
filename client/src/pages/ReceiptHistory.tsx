@@ -17,13 +17,11 @@ import { MainNav } from "@/components/main-nav";
 import { useToast } from "@/hooks/use-toast";
 
 const formatAmount = (amount: number) => {
-  // Convert amount from paise to rupees by dividing by 100
-  const amountInRupees = amount / 100;
   return new Intl.NumberFormat('hi-IN', {
     style: 'currency',
     currency: 'INR',
     maximumFractionDigits: 0
-  }).format(amountInRupees);
+  }).format(amount); // Amount is already in rupees, no need to divide by 100
 };
 
 const ReceiptHistory = () => {
@@ -231,6 +229,7 @@ const ReceiptHistory = () => {
             <TableBody>
               {receipts.map((receipt, index) => {
                 const statusInfo = getStatusInfo(receipt.status);
+                console.log('Receipt amount:', receipt.amount);
                 return (
                   <TableRow
                     key={receipt.id}
