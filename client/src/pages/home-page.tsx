@@ -18,6 +18,7 @@ import { Equipment } from "@shared/schema";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Chatbot } from "@/components/chatbot";
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -29,7 +30,13 @@ export default function HomePage() {
     error,
   } = useQuery<Equipment[]>({
     queryKey: ['/api/equipment'],
-    // Removed the filter from here since we want to show all equipment
+    select: (data) => {
+      // Sort equipment: available first, then unavailable
+      return [...data].sort((a, b) => {
+        if (a.availability === b.availability) return 0;
+        return a.availability ? -1 : 1;
+      });
+    }
   });
 
   if (isLoading) {
@@ -291,6 +298,7 @@ export default function HomePage() {
         </section>
       </main>
       <Footer />
+      <Chatbot />
     </div>
   );
 }
