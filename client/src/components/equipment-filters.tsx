@@ -22,8 +22,8 @@ export interface FilterParams {
   minPrice: number;
   maxPrice: number;
   location: string;
-  radius?: number;
-  season?: 'spring' | 'summer' | 'autumn' | 'winter';
+  //radius?: number;
+  //season?: 'spring' | 'summer' | 'autumn' | 'winter';
   specifications?: Record<string, any>;
 }
 
@@ -64,8 +64,8 @@ export function EquipmentFilters({ onFilterChange, maxPrice, isLoading = false }
       minPrice: 0,
       maxPrice: Number.MAX_SAFE_INTEGER,
       location: "",
-      radius: 50,
-      season: undefined,
+      //radius: 50,
+      //season: undefined,
       specifications: {}
     };
   });
@@ -119,8 +119,8 @@ export function EquipmentFilters({ onFilterChange, maxPrice, isLoading = false }
       minPrice: 0,
       maxPrice: maxPrice,
       location: "",
-      radius: 50,
-      season: undefined,
+      //radius: 50,
+      //season: undefined,
       specifications: {}
     };
     setFilters(defaultFilters);
@@ -252,7 +252,7 @@ export function EquipmentFilters({ onFilterChange, maxPrice, isLoading = false }
           </CardContent>
         </Card>
 
-        {/* Location and Radius filter */}
+        {/* Location filter */}
         <Card>
           <CardContent className="p-4">
             <Label className="flex items-center gap-2 mb-2">
@@ -278,55 +278,6 @@ export function EquipmentFilters({ onFilterChange, maxPrice, isLoading = false }
                   </Button>
                 )}
               </div>
-
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Ruler className="h-4 w-4" />
-                  {t('filters.radius', 'Search Radius (km)')}
-                </Label>
-                <Slider
-                  value={[filters.radius || 50]}
-                  min={1}
-                  max={200}
-                  step={1}
-                  onValueChange={([value]) => handleFilterChange({ radius: value })}
-                  className="mb-2"
-                />
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>1 km</span>
-                  <span>{filters.radius} km</span>
-                  <span>200 km</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Seasonal Availability */}
-        <Card>
-          <CardContent className="p-4">
-            <Label className="flex items-center gap-2 mb-4">
-              <Calendar className="h-4 w-4" />
-              {t('filters.seasonal', 'Seasonal Availability')}
-            </Label>
-            <div className="grid grid-cols-2 gap-4">
-              {SEASONS.map(({ id, label }) => (
-                <div key={id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`season-${id}`}
-                    checked={filters.season === id}
-                    onCheckedChange={(checked) =>
-                      handleFilterChange({ season: checked ? id : undefined })
-                    }
-                  />
-                  <label
-                    htmlFor={`season-${id}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {t(`seasons.${id}`, label)}
-                  </label>
-                </div>
-              ))}
             </div>
           </CardContent>
         </Card>

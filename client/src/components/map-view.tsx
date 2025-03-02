@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaf
 import { Equipment } from '@shared/schema';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Loader2, Navigation2, List, Map } from 'lucide-react';
+import { Loader2, Navigation2, List, Map, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
 import L from 'leaflet';
@@ -182,29 +182,49 @@ export function MapView({
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{t('equipment.availableEquipment')}</h2>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            setIsViewChanging(true);
-            setViewMode(prev => prev === 'map' ? 'list' : 'map');
-            setMapKey(k => k + 1);
-            setTimeout(() => setIsViewChanging(false), 500);
-          }}
-          className="flex items-center gap-2"
-        >
-          {viewMode === 'map' ? (
-            <>
-              <List className="h-4 w-4" />
-              <span>{t('map.listView')}</span>
-            </>
-          ) : (
-            <>
-              <Map className="h-4 w-4" />
-              <span>{t('map.mapView')}</span>
-            </>
+        <div className="flex gap-2">
+          {viewMode === 'map' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                // Clear all markers/locations
+                if (onLocationSelect) {
+                  onLocationSelect("");
+                }
+                setMapKey(k => k + 1);
+                setIsMapLoading(true);
+              }}
+              className="flex items-center gap-2"
+            >
+              <RotateCcw className="h-4 w-4" />
+              <span>{t('map.clear', 'Clear')}</span>
+            </Button>
           )}
-        </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setIsViewChanging(true);
+              setViewMode(prev => prev === 'map' ? 'list' : 'map');
+              setMapKey(k => k + 1);
+              setTimeout(() => setIsViewChanging(false), 500);
+            }}
+            className="flex items-center gap-2"
+          >
+            {viewMode === 'map' ? (
+              <>
+                <List className="h-4 w-4" />
+                <span>{t('map.listView')}</span>
+              </>
+            ) : (
+              <>
+                <Map className="h-4 w-4" />
+                <span>{t('map.mapView')}</span>
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {isViewChanging ? (

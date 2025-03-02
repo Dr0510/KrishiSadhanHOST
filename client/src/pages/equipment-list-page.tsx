@@ -55,8 +55,7 @@ export default function EquipmentListPage() {
         filters.location === "" ||
         item.location.toLowerCase() === filters.location.toLowerCase();
 
-      const matchesSeason = !filters.season || 
-        (item.seasonalAvailability && item.seasonalAvailability[filters.season]);
+      const matchesSeason = true; //removed seasonal filter
 
       return matchesSearch && matchesCategory && matchesPrice && matchesLocation && matchesSeason;
     });
@@ -153,17 +152,19 @@ export default function EquipmentListPage() {
         </div>
 
         <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-12 lg:col-span-3">
-            <EquipmentFilters
-              onFilterChange={setFilters}
-              maxPrice={Math.max(...(equipment?.map(item => item.dailyRate) || [100000]))}
-              isLoading={isLoading}
-            />
-          </div>
+          {viewMode !== "map" && (
+            <div className="col-span-12 lg:col-span-3">
+              <EquipmentFilters
+                onFilterChange={setFilters}
+                maxPrice={Math.max(...(equipment?.map(item => item.dailyRate) || [100000]))}
+                isLoading={isLoading}
+              />
+            </div>
+          )}
 
-          <div className="col-span-12 lg:col-span-9">
+          <div className={`col-span-12 ${viewMode !== "map" ? "lg:col-span-9" : ""}`}>
             {viewMode === "map" ? (
-              <MapView 
+              <MapView
                 equipment={filteredEquipment}
                 onMarkerClick={handleMarkerClick}
                 onLocationSelect={handleLocationSelect}
