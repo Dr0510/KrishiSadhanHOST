@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,8 +25,8 @@ const equipmentFormSchema = z.object({
   image: z.any().optional(),
   features: z.array(z.string()).optional(),
   specs: z.record(z.string(), z.string()).optional(),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
+  latitudeCoord: z.number().optional(),
+  longitudeCoord: z.number().optional(),
 });
 
 type EquipmentFormValues = z.infer<typeof equipmentFormSchema>;
@@ -77,8 +76,8 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
       location: equipment?.location || '',
       features: equipment?.features || [],
       specs: equipment?.specs || {},
-      latitude: equipment?.latitudeCoord ? parseFloat(equipment.latitudeCoord) : undefined,
-      longitude: equipment?.longitudeCoord ? parseFloat(equipment.longitudeCoord) : undefined,
+      latitudeCoord: equipment?.latitudeCoord ? parseFloat(equipment.latitudeCoord) : undefined,
+      longitudeCoord: equipment?.longitudeCoord ? parseFloat(equipment.longitudeCoord) : undefined,
     },
   });
 
@@ -128,39 +127,39 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
   // Handle map location selection
   const handleLocationSelect = (lat: number, lng: number) => {
     setCoordinates({ lat, lng });
-    form.setValue('latitude', lat);
-    form.setValue('longitude', lng);
+    form.setValue('latitudeCoord', lat);
+    form.setValue('longitudeCoord', lng);
   };
 
   // Handle form submission
   const handleSubmit = async (values: EquipmentFormValues) => {
     const formData = new FormData();
-    
+
     // Add basic fields
     formData.append('name', values.name);
     formData.append('description', values.description);
     formData.append('category', values.category);
     formData.append('dailyRate', values.dailyRate.toString());
     formData.append('location', values.location);
-    
+
     // Add image if available
     const imageInput = document.querySelector<HTMLInputElement>('input[type="file"]');
     if (imageInput?.files?.[0]) {
       formData.append('image', imageInput.files[0]);
     }
-    
+
     // Add features
     formData.append('features', JSON.stringify(features));
-    
+
     // Add specs
     formData.append('specs', JSON.stringify(specs));
-    
+
     // Add coordinates if available
     if (coordinates) {
       formData.append('latitudeCoord', coordinates.lat.toString());
       formData.append('longitudeCoord', coordinates.lng.toString());
     }
-    
+
     try {
       await onSubmit(formData);
     } catch (error) {
@@ -180,7 +179,7 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
           {equipment ? t('equipment.edit', 'Edit Equipment') : t('equipment.add', 'Add New Equipment')}
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -199,7 +198,7 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="category"
@@ -227,7 +226,7 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="dailyRate"
@@ -246,7 +245,7 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="location"
@@ -256,15 +255,12 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
                     <FormControl>
                       <Input placeholder={t('equipment.locationPlaceholder', 'Enter city or location')} {...field} />
                     </FormControl>
-                    <FormDescription>
-                      {t('equipment.locationDesc', 'Enter the city where this equipment is available')}
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-            
+
             <FormField
               control={form.control}
               name="description"
@@ -282,7 +278,7 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
                 </FormItem>
               )}
             />
-            
+
             {/* Image Upload */}
             <div>
               <FormLabel>{t('equipment.image', 'Equipment Image')}</FormLabel>
@@ -293,7 +289,7 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
                   onChange={handleImageChange} 
                 />
               </div>
-              
+
               {imagePreview && (
                 <div className="mt-4">
                   <p className="text-sm font-medium mb-2">{t('equipment.preview', 'Preview:')}</p>
@@ -303,7 +299,7 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
                 </div>
               )}
             </div>
-            
+
             {/* Features */}
             <div>
               <FormLabel>{t('equipment.features', 'Features')}</FormLabel>
@@ -318,7 +314,7 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
                   {t('common.add', 'Add')}
                 </Button>
               </div>
-              
+
               {features.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-4">
                   {features.map(feature => (
@@ -336,7 +332,7 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
                 </div>
               )}
             </div>
-            
+
             {/* Specifications */}
             <div>
               <FormLabel>{t('equipment.specs', 'Specifications')}</FormLabel>
@@ -356,7 +352,7 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
                   {t('common.add', 'Add')}
                 </Button>
               </div>
-              
+
               {Object.keys(specs).length > 0 && (
                 <div className="mt-4">
                   <table className="w-full border-collapse">
@@ -389,28 +385,28 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
                 </div>
               )}
             </div>
-            
+
             {/* Map for Location Selection */}
             <div>
               <FormLabel>{t('equipment.mapLocation', 'Map Location')}</FormLabel>
               <FormDescription>
                 {t('equipment.mapLocationDesc', 'Select the exact location on the map where the equipment is available')}
               </FormDescription>
-              
+
               <div className="mt-2">
                 <EquipmentFormMap 
                   initialLocation={coordinates}
                   onLocationSelect={handleLocationSelect}
                 />
               </div>
-              
+
               {coordinates && (
                 <p className="text-sm text-muted-foreground mt-2">
                   {t('equipment.coordinatesSelected', 'Coordinates selected')}: {coordinates.lat.toFixed(6)}, {coordinates.lng.toFixed(6)}
                 </p>
               )}
             </div>
-            
+
             <CardFooter className="flex justify-end gap-2 px-0">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? t('common.submitting', 'Submitting...') : (

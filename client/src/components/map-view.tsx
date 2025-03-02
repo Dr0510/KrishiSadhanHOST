@@ -84,8 +84,10 @@ export function MapView({
   // Force map refresh when equipment data changes
   useEffect(() => {
     // Reset map key to force a refresh when equipment changes
-    if (viewMode === 'map' && equipment.length > 0) {
+    if (viewMode === 'map') {
+      console.log("Equipment data changed, refreshing map markers", equipment.length);
       setMapKey(prev => prev + 1);
+      setIsMapLoading(true);
     }
   }, [equipment, viewMode]);
 

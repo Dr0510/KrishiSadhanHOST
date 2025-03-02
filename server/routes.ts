@@ -220,7 +220,7 @@ export function registerRoutes(app: Express): Server {
       }
       
       // If no direct coordinates, try to find from city map
-      if (!coordinates) {
+      if (!coordinates && location) {
         // Try different location formats in the city map
         coordinates = cityCoordinates[location] || 
                       cityCoordinates[location.replace('.', '')] || // Try without period
@@ -231,6 +231,12 @@ export function registerRoutes(app: Express): Server {
           console.log('Found coordinates for location:', location, coordinates);
         } else {
           console.log('No coordinates found for location:', location);
+          
+          // If location is provided but no coordinates found, use default coordinates for unknown location
+          if (location && location.length > 0) {
+            coordinates = [20.5937, 78.9629]; // Default to center of India
+            console.log('Using default coordinates for unknown location:', location);
+          }
         }
       }
 

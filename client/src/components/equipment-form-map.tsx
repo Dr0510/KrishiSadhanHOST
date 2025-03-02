@@ -57,8 +57,13 @@ export default function EquipmentFormMap({ initialLocation, onLocationSelect }: 
             title: t('equipment.locationSelected', 'Location Selected'),
             description: t('equipment.nearCity', 'Near: {{city}}', { city: locationName }),
           });
+          
+          // Store city name in local storage for form reference
+          localStorage.setItem('lastSelectedLocation', locationName);
         }
       });
+      
+    console.log('Location selected:', newLocation);
   };
 
   const handleUseCurrentLocation = () => {
