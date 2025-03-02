@@ -17,12 +17,11 @@ import { MainNav } from "@/components/main-nav";
 import { useToast } from "@/hooks/use-toast";
 
 const formatAmount = (amountInPaise: number) => {
-  // Display amount as is without converting from paise to rupees
-  return new Intl.NumberFormat('hi-IN', {
-    style: 'currency',
-    currency: 'INR',
+  // Display amount in paise (no conversion to rupees)
+  return new Intl.NumberFormat("hi-IN", {
+    style: "decimal", // Changed from 'currency' to 'decimal' for paise format
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    maximumFractionDigits: 0,
   }).format(amountInPaise);
 };
 
@@ -31,68 +30,80 @@ const ReceiptHistory = () => {
   const { toast } = useToast();
 
   const getStatusInfo = (status: string) => {
-    const statusDisplayMap: Record<string, { text: string, className: string }> = {
+    const statusDisplayMap: Record<
+      string,
+      { text: string; className: string }
+    > = {
       paid: {
-        text: t('receipts.status.paid', 'Paid'),
-        className: 'bg-green-100 text-green-800'
+        text: t("receipts.status.paid", "Paid"),
+        className: "bg-green-100 text-green-800",
       },
       pending: {
-        text: t('receipts.status.pending', 'Pending'),
-        className: 'bg-yellow-100 text-yellow-800'
+        text: t("receipts.status.pending", "Pending"),
+        className: "bg-yellow-100 text-yellow-800",
       },
       failed: {
-        text: t('receipts.status.failed', 'Failed'),
-        className: 'bg-red-100 text-red-800'
-      }
+        text: t("receipts.status.failed", "Failed"),
+        className: "bg-red-100 text-red-800",
+      },
     };
 
-    return statusDisplayMap[status.toLowerCase()] || {
-      text: status.charAt(0).toUpperCase() + status.slice(1),
-      className: 'bg-gray-100 text-gray-800'
-    };
+    return (
+      statusDisplayMap[status.toLowerCase()] || {
+        text: status.charAt(0).toUpperCase() + status.slice(1),
+        className: "bg-gray-100 text-gray-800",
+      }
+    );
   };
 
-  const { data: receipts, isLoading, error } = useQuery<Receipt[]>({
-    queryKey: ['/api/receipts'],
+  const {
+    data: receipts,
+    isLoading,
+    error,
+  } = useQuery<Receipt[]>({
+    queryKey: ["/api/receipts"],
     queryFn: async () => {
-      const response = await fetch('/api/receipts', {
-        credentials: 'include'
+      const response = await fetch("/api/receipts", {
+        credentials: "include",
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to fetch receipts');
+        throw new Error(error.message || "Failed to fetch receipts");
       }
       return response.json();
-    }
+    },
   });
 
   const handleDownload = async (receiptId: number) => {
     try {
       toast({
-        title: t('receipts.downloading', 'Downloading Receipt...'),
-        description: t('receipts.downloadingDesc', 'Please wait while we prepare your receipt.'),
+        title: t("receipts.downloading", "Downloading Receipt..."),
+        description: t(
+          "receipts.downloadingDesc",
+          "Please wait while we prepare your receipt.",
+        ),
       });
 
       const response = await fetch(`/api/receipts/${receiptId}/download`, {
-        credentials: 'include'
+        credentials: "include",
       });
 
       if (!response.ok) {
-        throw new Error('Failed to download receipt');
+        throw new Error("Failed to download receipt");
       }
 
-      const contentDisposition = response.headers.get('Content-Disposition');
+      const contentDisposition = response.headers.get("Content-Disposition");
       let filename = `receipt-${receiptId}.pdf`;
       if (contentDisposition) {
-        const matches = /filename=([^;]+)/ig.exec(contentDisposition);
+        const matches = /filename=([^;]+)/gi.exec(contentDisposition);
         if (matches?.length) {
-          filename = matches[1].replace(/["']/g, '');
+          filename = matches[1].replace(/["']/g, "");
         }
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = filename;
       document.body.appendChild(a);
@@ -101,15 +112,21 @@ const ReceiptHistory = () => {
       document.body.removeChild(a);
 
       toast({
-        title: t('receipts.downloadSuccess', 'Receipt Downloaded'),
-        description: t('receipts.downloadSuccessDesc', 'Your receipt has been downloaded successfully.'),
+        title: t("receipts.downloadSuccess", "Receipt Downloaded"),
+        description: t(
+          "receipts.downloadSuccessDesc",
+          "Your receipt has been downloaded successfully.",
+        ),
       });
     } catch (error) {
-      console.error('Download error:', error);
+      console.error("Download error:", error);
       toast({
         variant: "destructive",
-        title: t('receipts.downloadError', 'Download Failed'),
-        description: t('receipts.downloadErrorDesc', 'Failed to download the receipt. Please try again.'),
+        title: t("receipts.downloadError", "Download Failed"),
+        description: t(
+          "receipts.downloadErrorDesc",
+          "Failed to download the receipt. Please try again.",
+        ),
       });
     }
   };
@@ -119,7 +136,9 @@ const ReceiptHistory = () => {
       <div className="min-h-screen bg-background">
         <MainNav />
         <div className="container mx-auto py-8">
-          <h1 className="text-2xl font-bold mb-6">{t('receipts.title', 'Receipt History')}</h1>
+          <h1 className="text-2xl font-bold mb-6">
+            {t("receipts.title", "Receipt History")}
+          </h1>
           <div className="flex items-center justify-center min-h-[200px]">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
@@ -133,12 +152,18 @@ const ReceiptHistory = () => {
       <div className="min-h-screen bg-background">
         <MainNav />
         <div className="container mx-auto py-8">
-          <h1 className="text-2xl font-bold mb-6">{t('receipts.title', 'Receipt History')}</h1>
+          <h1 className="text-2xl font-bold mb-6">
+            {t("receipts.title", "Receipt History")}
+          </h1>
           <Card>
             <CardContent className="flex flex-col items-center justify-center min-h-[200px] text-center p-6">
-              <p className="text-destructive mb-4">{t('common.error', 'Error')}</p>
+              <p className="text-destructive mb-4">
+                {t("common.error", "Error")}
+              </p>
               <p className="text-muted-foreground">
-                {error instanceof Error ? error.message : t('common.loadError', 'Failed to load receipts')}
+                {error instanceof Error
+                  ? error.message
+                  : t("common.loadError", "Failed to load receipts")}
               </p>
             </CardContent>
           </Card>
@@ -152,11 +177,13 @@ const ReceiptHistory = () => {
       <div className="min-h-screen bg-background">
         <MainNav />
         <div className="container mx-auto py-8">
-          <h1 className="text-2xl font-bold mb-6">{t('receipts.title', 'Receipt History')}</h1>
+          <h1 className="text-2xl font-bold mb-6">
+            {t("receipts.title", "Receipt History")}
+          </h1>
           <Card>
             <CardContent className="flex flex-col items-center justify-center min-h-[200px] text-center p-6">
               <p className="text-muted-foreground">
-                {t('receipts.noReceipts', 'No receipts found')}
+                {t("receipts.noReceipts", "No receipts found")}
               </p>
             </CardContent>
           </Card>
@@ -169,46 +196,69 @@ const ReceiptHistory = () => {
     <div className="min-h-screen bg-background">
       <MainNav />
       <div className="container mx-auto py-8 animate-fade-in">
-        <h1 className="text-2xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">{t('receipts.title', 'Receipt History')}</h1>
+        <h1 className="text-2xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+          {t("receipts.title", "Receipt History")}
+        </h1>
 
         <div className="rounded-lg border bg-card shadow-custom animate-slide-up">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead className="font-bold">{t('receipts.receiptId', 'Receipt ID')}</TableHead>
-                <TableHead className="font-bold">{t('receipts.equipment', 'Equipment')}</TableHead>
-                <TableHead className="font-bold">{t('receipts.bookingPeriod', 'Booking Period')}</TableHead>
-                <TableHead className="font-bold">{t('receipts.amount', 'Amount')}</TableHead>
-                <TableHead className="font-bold">{t('receipts.paymentStatus', 'Payment Status')}</TableHead>
-                <TableHead className="font-bold">{t('receipts.generatedOn', 'Generated On')}</TableHead>
-                <TableHead className="text-right font-bold">{t('common.actions', 'Actions')}</TableHead>
+                <TableHead className="font-bold">
+                  {t("receipts.receiptId", "Receipt ID")}
+                </TableHead>
+                <TableHead className="font-bold">
+                  {t("receipts.equipment", "Equipment")}
+                </TableHead>
+                <TableHead className="font-bold">
+                  {t("receipts.bookingPeriod", "Booking Period")}
+                </TableHead>
+                <TableHead className="font-bold">
+                  {t("receipts.amount", "Amount")}
+                </TableHead>
+                <TableHead className="font-bold">
+                  {t("receipts.paymentStatus", "Payment Status")}
+                </TableHead>
+                <TableHead className="font-bold">
+                  {t("receipts.generatedOn", "Generated On")}
+                </TableHead>
+                <TableHead className="text-right font-bold">
+                  {t("common.actions", "Actions")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {receipts.map((receipt, index) => {
                 const statusInfo = getStatusInfo(receipt.status);
                 return (
-                  <TableRow 
-                    key={receipt.id} 
+                  <TableRow
+                    key={receipt.id}
                     className="hover:bg-muted/20 transition-colors animate-slide-up"
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
                     <TableCell className="font-medium">#{receipt.id}</TableCell>
-                    <TableCell>{receipt.metadata.equipment_name || t('common.notAvailable', 'N/A')}</TableCell>
+                    <TableCell>
+                      {receipt.metadata.equipment_name ||
+                        t("common.notAvailable", "N/A")}
+                    </TableCell>
                     <TableCell>
                       {receipt.metadata.booking_dates ? (
                         <>
-                          {formatDate(receipt.metadata.booking_dates.start)} {t('common.to', 'to')} {formatDate(receipt.metadata.booking_dates.end)}
+                          {formatDate(receipt.metadata.booking_dates.start)}{" "}
+                          {t("common.to", "to")}{" "}
+                          {formatDate(receipt.metadata.booking_dates.end)}
                         </>
                       ) : (
-                        t('common.notAvailable', 'N/A')
+                        t("common.notAvailable", "N/A")
                       )}
                     </TableCell>
                     <TableCell className="font-semibold text-primary">
                       {formatAmount(Number(receipt.amount))}
                     </TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusInfo.className}`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusInfo.className}`}
+                      >
                         {statusInfo.text}
                       </span>
                     </TableCell>
@@ -221,7 +271,7 @@ const ReceiptHistory = () => {
                         className="inline-flex items-center gap-2 hover:bg-primary/10 transition-all"
                       >
                         <Download className="h-4 w-4" />
-                        {t('receipts.download', 'Download')}
+                        {t("receipts.download", "Download")}
                       </Button>
                     </TableCell>
                   </TableRow>
