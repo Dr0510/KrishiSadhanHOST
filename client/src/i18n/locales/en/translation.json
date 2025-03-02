@@ -1,0 +1,9 @@
+
+{
+  "equipment": {
+    "unavailable": "Unavailable",
+    "available": "Available",
+    "viewDetails": "View Details",
+    "currentlyUnavailable": "Unavailable"
+  }
+}

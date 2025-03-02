@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* Leaflet Map Styles */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1;
+}
+
+.leaflet-control-container {
+  z-index: 1000;
+  position: relative;
+}
+
+.leaflet-control-zoom {
+  @apply shadow-lg;
+  border: none !important;
+}
+
+.leaflet-control-zoom a {
+  background-color: white !important;
+  color: #666 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  @apply rounded-lg shadow-lg;
+}
+
+.leaflet-popup-content {
+  @apply p-2;
+  margin: 0;
+}
+
+.custom-marker {
+  background: transparent;
+  border: none;
+}

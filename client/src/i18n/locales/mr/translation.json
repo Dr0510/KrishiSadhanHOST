@@ -1,0 +1,9 @@
+
+{
+  "equipment": {
+    "unavailable": "अनुपलब्ध",
+    "available": "उपलब्ध",
+    "viewDetails": "तपशील पहा",
+    "currentlyUnavailable": "अनुपलब्ध"
+  }
+}
