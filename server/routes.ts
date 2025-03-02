@@ -215,7 +215,7 @@ export function registerRoutes(app: Express): Server {
         const lng = parseFloat(req.body.longitudeCoord);
         if (!isNaN(lat) && !isNaN(lng)) {
           coordinates = [lat, lng];
-          console.log('Using custom coordinates:', coordinates);
+          console.log('Using custom coordinates from form:', coordinates);
         }
       }
       
@@ -235,14 +235,14 @@ export function registerRoutes(app: Express): Server {
         } else {
           console.log('No coordinates found for location:', location);
           
-          // If location is provided but no coordinates found, use default coordinates for unknown location
+          // If location is provided but no coordinates found, try more thorough matching
           if (location && location.length > 0) {
             // Try a fuzzy match with cityCoordinates keys
             let bestMatch = '';
             let maxSimilarity = 0;
             
             Object.keys(cityCoordinates).forEach(city => {
-              // Simple similarity check - if location is substring of city or vice versa
+              // Check if location contains city name or vice versa
               if (city.includes(normalizedLocation) || normalizedLocation.includes(city)) {
                 const similarity = Math.min(city.length, normalizedLocation.length) / 
                                   Math.max(city.length, normalizedLocation.length);
@@ -257,8 +257,22 @@ export function registerRoutes(app: Express): Server {
               coordinates = cityCoordinates[bestMatch];
               console.log(`Found fuzzy match for "${location}": "${bestMatch}"`, coordinates);
             } else {
-              coordinates = [20.5937, 78.9629]; // Default to center of India
-              console.log('Using default coordinates for unknown location:', location);
+              // Split location by commas and check each part
+              const locationParts = normalizedLocation.split(',');
+              for (const part of locationParts) {
+                const trimmedPart = part.trim();
+                if (cityCoordinates[trimmedPart]) {
+                  coordinates = cityCoordinates[trimmedPart];
+                  console.log(`Found coordinates for location part "${trimmedPart}"`, coordinates);
+                  break;
+                }
+              }
+              
+              // If still no coordinates, use default
+              if (!coordinates) {
+                coordinates = [20.5937, 78.9629]; // Default to center of India
+                console.log('Using default coordinates for unknown location:', location);
+              }
             }
           }
         }

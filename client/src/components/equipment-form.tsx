@@ -126,10 +126,11 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
 
   // Handle map location selection
   const handleLocationSelect = (lat: number, lng: number) => {
-    console.log('Location coordinates selected:', lat, lng);
-    form.setValue('latitudeCoord', lat);
-    form.setValue('longitudeCoord', lng);
-    setCoordinates({lat, lng});
+    setCoordinates({ lat, lng });
+    // Add the coordinates to form data
+    form.setValue("latitudeCoord", lat.toString());
+    form.setValue("longitudeCoord", lng.toString());
+    console.log(`Set coordinates in form: ${lat}, ${lng}`);
   };
 
   // Listen for location changes from the map component

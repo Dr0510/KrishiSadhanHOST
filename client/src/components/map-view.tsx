@@ -228,20 +228,39 @@ export function MapView({
                   const lng = parseFloat(item.longitudeCoord);
                   if (!isNaN(lat) && !isNaN(lng)) {
                     markerPosition = [lat, lng];
-                    console.log(`Using stored coordinates for ${item.name}:`, markerPosition);
+                    console.log(`Using database coordinates for ${item.name}:`, markerPosition);
                   }
                 }
                 
                 // If no coordinates, fall back to city map
                 if (!markerPosition) {
-                  const cityName = item.location!.toLowerCase().trim();
-                  markerPosition = cityCoordinates[cityName] || null;
-                  console.log(`Using city coordinates for ${item.name}:`, markerPosition);
+                  // Clean and normalize location name before lookup
+                  const locationName = item.location!.toLowerCase().trim();
+                  
+                  // Try direct match first
+                  markerPosition = cityCoordinates[locationName];
+                  
+                  // If not found, try alternate lookups (partial matches)
+                  if (!markerPosition) {
+                    // Look for substring matches
+                    for (const [city, coords] of Object.entries(cityCoordinates)) {
+                      if (locationName.includes(city) || city.includes(locationName)) {
+                        markerPosition = coords;
+                        console.log(`Found partial location match for ${locationName}: using ${city} coordinates`);
+                        break;
+                      }
+                    }
+                  }
+                  
+                  if (markerPosition) {
+                    console.log(`Using map coordinates for ${item.name}:`, markerPosition);
+                  }
                 }
 
+                // If still no coordinates, use default position for India
                 if (!markerPosition) {
-                  console.log(`No coordinates found for ${item.name} at ${item.location}`);
-                  return null;
+                  markerPosition = [20.5937, 78.9629]; // Center of India as fallback
+                  console.log(`Using default coordinates for ${item.name} at ${item.location}`);
                 }
 
                 return (
