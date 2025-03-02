@@ -16,13 +16,14 @@ import type { Receipt } from "@shared/schema";
 import { MainNav } from "@/components/main-nav";
 import { useToast } from "@/hooks/use-toast";
 
-const formatAmount = (amountInPaise: number) => {
-  // Display amount in paise (no conversion to rupees)
-  return new Intl.NumberFormat("hi-IN", {
-    style: "decimal", // Changed from 'currency' to 'decimal' for paise format
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amountInPaise);
+const formatAmount = (amount: number) => {
+  // Convert amount from paise to rupees by dividing by 100
+  const amountInRupees = amount / 100;
+  return new Intl.NumberFormat('hi-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  }).format(amountInRupees);
 };
 
 const ReceiptHistory = () => {
@@ -253,7 +254,7 @@ const ReceiptHistory = () => {
                       )}
                     </TableCell>
                     <TableCell className="font-semibold text-primary">
-                      {formatAmount(Number(receipt.amount))}
+                      {formatAmount(receipt.amount)}
                     </TableCell>
                     <TableCell>
                       <span
