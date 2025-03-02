@@ -88,6 +88,16 @@ export function MapView({
       console.log("Equipment data changed, refreshing map markers", equipment.length);
       setMapKey(prev => prev + 1);
       setIsMapLoading(true);
+      
+      // Clear and rebuild markers cache on data change
+      markersRef.current = {};
+      
+      // Log equipment locations for debugging
+      equipment.forEach(item => {
+        if (item.location) {
+          console.log(`Equipment ${item.id}: ${item.name} - Location: ${item.location}, Coordinates: ${item.latitudeCoord},${item.longitudeCoord}`);
+        }
+      });
     }
   }, [equipment, viewMode]);
 

@@ -234,8 +234,29 @@ export function registerRoutes(app: Express): Server {
           
           // If location is provided but no coordinates found, use default coordinates for unknown location
           if (location && location.length > 0) {
-            coordinates = [20.5937, 78.9629]; // Default to center of India
-            console.log('Using default coordinates for unknown location:', location);
+            // Try a fuzzy match with cityCoordinates keys
+            let bestMatch = '';
+            let maxSimilarity = 0;
+            
+            Object.keys(cityCoordinates).forEach(city => {
+              // Simple similarity check - if location is substring of city or vice versa
+              if (city.includes(location) || location.includes(city)) {
+                const similarity = Math.min(city.length, location.length) / 
+                                  Math.max(city.length, location.length);
+                if (similarity > maxSimilarity) {
+                  maxSimilarity = similarity;
+                  bestMatch = city;
+                }
+              }
+            });
+            
+            if (bestMatch && maxSimilarity > 0.5) {
+              coordinates = cityCoordinates[bestMatch];
+              console.log(`Found fuzzy match for "${location}": "${bestMatch}"`, coordinates);
+            } else {
+              coordinates = [20.5937, 78.9629]; // Default to center of India
+              console.log('Using default coordinates for unknown location:', location);
+            }
           }
         }
       }

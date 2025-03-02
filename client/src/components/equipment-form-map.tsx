@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { Card, CardContent } from '@/components/ui/card';
@@ -39,7 +38,7 @@ export default function EquipmentFormMap({ initialLocation, onLocationSelect }: 
   const { toast } = useToast();
   const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(initialLocation || null);
   const [isLocating, setIsLocating] = useState(false);
-  
+
   // Center the map on India if no initial location
   const defaultCenter: [number, number] = [20.5937, 78.9629];
   const mapRef = useRef<L.Map | null>(null);
@@ -48,7 +47,7 @@ export default function EquipmentFormMap({ initialLocation, onLocationSelect }: 
     const newLocation = { lat: latLng.lat, lng: latLng.lng };
     setMarker(newLocation);
     onLocationSelect(newLocation.lat, newLocation.lng);
-    
+
     // Try to find nearest city for user reference
     fetchNearestLocation(newLocation.lat, newLocation.lng)
       .then(locationName => {
@@ -57,18 +56,24 @@ export default function EquipmentFormMap({ initialLocation, onLocationSelect }: 
             title: t('equipment.locationSelected', 'Location Selected'),
             description: t('equipment.nearCity', 'Near: {{city}}', { city: locationName }),
           });
-          
+
           // Store city name in local storage for form reference
           localStorage.setItem('lastSelectedLocation', locationName);
+
+          // Dispatch a custom event so the main form can update its location field
+          const event = new CustomEvent('locationSelected', { 
+            detail: { locationName, coordinates: newLocation } 
+          });
+          window.dispatchEvent(event);
         }
       });
-      
+
     console.log('Location selected:', newLocation);
   };
 
   const handleUseCurrentLocation = () => {
     setIsLocating(true);
-    
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -76,16 +81,16 @@ export default function EquipmentFormMap({ initialLocation, onLocationSelect }: 
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
-          
+
           setMarker(newLocation);
           onLocationSelect(newLocation.lat, newLocation.lng);
-          
+
           if (mapRef.current) {
             mapRef.current.flyTo([newLocation.lat, newLocation.lng], 13);
           }
-          
+
           setIsLocating(false);
-          
+
           fetchNearestLocation(newLocation.lat, newLocation.lng)
             .then(locationName => {
               if (locationName) {
@@ -137,10 +142,10 @@ export default function EquipmentFormMap({ initialLocation, onLocationSelect }: 
         'nashik': [19.9975, 73.7898],
         'barshi': [18.2333, 75.6833],
       };
-      
+
       let nearestCity = null;
       let shortestDistance = Infinity;
-      
+
       Object.entries(cityCoordinates).forEach(([city, [cityLat, cityLng]]) => {
         const distance = Math.sqrt(
           Math.pow(lat - cityLat, 2) + Math.pow(lng - cityLng, 2)
@@ -150,7 +155,7 @@ export default function EquipmentFormMap({ initialLocation, onLocationSelect }: 
           nearestCity = city;
         }
       });
-      
+
       return nearestCity ? nearestCity.charAt(0).toUpperCase() + nearestCity.slice(1) : null;
     } catch (error) {
       console.error('Error finding nearest location:', error);
@@ -175,7 +180,7 @@ export default function EquipmentFormMap({ initialLocation, onLocationSelect }: 
             {isLocating ? t('common.detecting', 'Detecting...') : t('equipment.useCurrentLocation', 'Use My Current Location')}
           </Button>
         </div>
-        
+
         <div className="h-[400px] relative border rounded-md overflow-hidden">
           <MapContainer
             center={initialLocation ? [initialLocation.lat, initialLocation.lng] : defaultCenter}
@@ -195,7 +200,7 @@ export default function EquipmentFormMap({ initialLocation, onLocationSelect }: 
             )}
           </MapContainer>
         </div>
-        
+
         {marker && (
           <div className="mt-4 text-sm">
             <p className="font-semibold">{t('equipment.selectedCoordinates', 'Selected Coordinates')}:</p>
