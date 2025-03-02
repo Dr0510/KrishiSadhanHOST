@@ -20,6 +20,26 @@ const ReceiptHistory = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
 
+  const {
+    data: receipts,
+    isLoading,
+    error,
+  } = useQuery<Receipt[]>({
+    queryKey: ["/api/receipts"],
+    queryFn: async () => {
+      const response = await fetch("/api/receipts", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to fetch receipts");
+      }
+      const data = await response.json();
+      console.log('Receipt data:', data); // Debug log
+      return data;
+    },
+  });
+
   const getStatusInfo = (status: string) => {
     const statusDisplayMap: Record<
       string,
@@ -46,24 +66,6 @@ const ReceiptHistory = () => {
       }
     );
   };
-
-  const {
-    data: receipts,
-    isLoading,
-    error,
-  } = useQuery<Receipt[]>({
-    queryKey: ["/api/receipts"],
-    queryFn: async () => {
-      const response = await fetch("/api/receipts", {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to fetch receipts");
-      }
-      return response.json();
-    },
-  });
 
   const handleDownload = async (receiptId: number) => {
     try {
@@ -186,12 +188,12 @@ const ReceiptHistory = () => {
   return (
     <div className="min-h-screen bg-background">
       <MainNav />
-      <div className="container mx-auto py-8 animate-fade-in">
+      <div className="container mx-auto py-8">
         <h1 className="text-2xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
           {t("receipts.title", "Receipt History")}
         </h1>
 
-        <div className="rounded-lg border bg-card shadow-custom animate-slide-up">
+        <div className="rounded-lg border bg-card shadow-custom">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
@@ -219,13 +221,12 @@ const ReceiptHistory = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {receipts.map((receipt, index) => {
+              {receipts?.map((receipt) => {
                 const statusInfo = getStatusInfo(receipt.status);
                 return (
                   <TableRow
                     key={receipt.id}
-                    className="hover:bg-muted/20 transition-colors animate-slide-up"
-                    style={{ animationDelay: `${index * 0.05}s` }}
+                    className="hover:bg-muted/20 transition-colors"
                   >
                     <TableCell className="font-medium">#{receipt.id}</TableCell>
                     <TableCell>
@@ -244,7 +245,7 @@ const ReceiptHistory = () => {
                       )}
                     </TableCell>
                     <TableCell className="font-semibold text-primary">
-                      ₹{(receipt.amount / 100).toLocaleString()}
+                      ₹{receipt.totalPrice.toLocaleString()}
                     </TableCell>
                     <TableCell>
                       <span
