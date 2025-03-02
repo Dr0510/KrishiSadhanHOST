@@ -200,15 +200,39 @@ export function registerRoutes(app: Express): Server {
         'chh. sambhajinagar': [19.8762, 75.3433],
         'nagpur': [21.1458, 79.0882],
         'nashik': [19.9975, 73.7898],
+        'barshi': [18.2333, 75.6833],
       };
 
       // Clean and format location string
       const location = req.body.location?.toLowerCase().trim();
-      // Try different location formats
-      const coordinates = cityCoordinates[location] || 
-                        cityCoordinates[location.replace('.', '')] || // Try without period
-                        cityCoordinates[location.replace(' ', '')] || // Try without space
-                        null;
+      
+      // Handle custom coordinates if provided
+      let coordinates = null;
+      
+      // First check if direct coordinates were provided
+      if (req.body.latitudeCoord && req.body.longitudeCoord) {
+        const lat = parseFloat(req.body.latitudeCoord);
+        const lng = parseFloat(req.body.longitudeCoord);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          coordinates = [lat, lng];
+          console.log('Using custom coordinates:', coordinates);
+        }
+      }
+      
+      // If no direct coordinates, try to find from city map
+      if (!coordinates) {
+        // Try different location formats in the city map
+        coordinates = cityCoordinates[location] || 
+                      cityCoordinates[location.replace('.', '')] || // Try without period
+                      cityCoordinates[location.replace(' ', '')] || // Try without space
+                      null;
+                      
+        if (coordinates) {
+          console.log('Found coordinates for location:', location, coordinates);
+        } else {
+          console.log('No coordinates found for location:', location);
+        }
+      }
 
       const equipmentData = {
         name: req.body.name,
@@ -321,6 +345,52 @@ export function registerRoutes(app: Express): Server {
 
       if (req.body.dailyRate) {
         updateData.dailyRate = parseInt(req.body.dailyRate);
+      }
+
+      // Update coordinates if location changed
+      if (req.body.location) {
+        const cityCoordinates = {
+          'pune': [18.5204, 73.8567],
+          'mumbai': [19.0760, 72.8777],
+          'delhi': [28.6139, 77.2090],
+          'bangalore': [12.9716, 77.5946],
+          'hyderabad': [17.3850, 78.4867],
+          'chennai': [13.0827, 80.2707],
+          'kolkata': [22.5726, 88.3639],
+          'ahmedabad': [23.0225, 72.5714],
+          'latur': [18.4088, 76.5604],
+          'nilanga': [18.1177, 76.7506],
+          'aurangabad': [19.8762, 75.3433],
+          'chh. sambhajinagar': [19.8762, 75.3433],
+          'nagpur': [21.1458, 79.0882],
+          'nashik': [19.9975, 73.7898],
+          'barshi': [18.2333, 75.6833],
+        };
+        
+        const location = req.body.location.toLowerCase().trim();
+        
+        // First check if direct coordinates were provided
+        if (req.body.latitudeCoord && req.body.longitudeCoord) {
+          const lat = parseFloat(req.body.latitudeCoord);
+          const lng = parseFloat(req.body.longitudeCoord);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            updateData.latitudeCoord = lat.toString();
+            updateData.longitudeCoord = lng.toString();
+            console.log('Updating with custom coordinates:', [lat, lng]);
+          }
+        } else {
+          // Try to find from city map
+          const coordinates = cityCoordinates[location] || 
+                            cityCoordinates[location.replace('.', '')] || 
+                            cityCoordinates[location.replace(' ', '')] || 
+                            null;
+                            
+          if (coordinates) {
+            updateData.latitudeCoord = coordinates[0].toString();
+            updateData.longitudeCoord = coordinates[1].toString();
+            console.log('Updated coordinates for location:', location, coordinates);
+          }
+        }
       }
 
       console.log('Updating equipment with data:', {

@@ -79,6 +79,15 @@ export function MapView({
   const [isMapLoading, setIsMapLoading] = useState(true);
   const [isViewChanging, setIsViewChanging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const markersRef = useRef<Record<number, L.Marker>>({});
+  
+  // Force map refresh when equipment data changes
+  useEffect(() => {
+    // Reset map key to force a refresh when equipment changes
+    if (viewMode === 'map' && equipment.length > 0) {
+      setMapKey(prev => prev + 1);
+    }
+  }, [equipment, viewMode]);
 
   const createCustomIcon = useCallback((dailyRate: number) => {
     return L.divIcon({
