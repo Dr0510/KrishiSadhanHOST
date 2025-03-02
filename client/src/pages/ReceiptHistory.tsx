@@ -168,28 +168,32 @@ const ReceiptHistory = () => {
   return (
     <div className="min-h-screen bg-background">
       <MainNav />
-      <div className="container mx-auto py-8">
-        <h1 className="text-2xl font-bold mb-6">{t('receipts.title', 'Receipt History')}</h1>
+      <div className="container mx-auto py-8 animate-fade-in">
+        <h1 className="text-2xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">{t('receipts.title', 'Receipt History')}</h1>
 
-        <div className="rounded-md border bg-card">
+        <div className="rounded-lg border bg-card shadow-custom animate-slide-up">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('receipts.receiptId', 'Receipt ID')}</TableHead>
-                <TableHead>{t('receipts.equipment', 'Equipment')}</TableHead>
-                <TableHead>{t('receipts.bookingPeriod', 'Booking Period')}</TableHead>
-                <TableHead>{t('receipts.amount', 'Amount')}</TableHead>
-                <TableHead>{t('receipts.paymentStatus', 'Payment Status')}</TableHead>
-                <TableHead>{t('receipts.generatedOn', 'Generated On')}</TableHead>
-                <TableHead className="text-right">{t('common.actions', 'Actions')}</TableHead>
+              <TableRow className="bg-muted/50">
+                <TableHead className="font-bold">{t('receipts.receiptId', 'Receipt ID')}</TableHead>
+                <TableHead className="font-bold">{t('receipts.equipment', 'Equipment')}</TableHead>
+                <TableHead className="font-bold">{t('receipts.bookingPeriod', 'Booking Period')}</TableHead>
+                <TableHead className="font-bold">{t('receipts.amount', 'Amount')}</TableHead>
+                <TableHead className="font-bold">{t('receipts.paymentStatus', 'Payment Status')}</TableHead>
+                <TableHead className="font-bold">{t('receipts.generatedOn', 'Generated On')}</TableHead>
+                <TableHead className="text-right font-bold">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {receipts.map((receipt) => {
+              {receipts.map((receipt, index) => {
                 const statusInfo = getStatusInfo(receipt.status);
                 return (
-                  <TableRow key={receipt.id}>
-                    <TableCell>#{receipt.id}</TableCell>
+                  <TableRow 
+                    key={receipt.id} 
+                    className="hover:bg-muted/20 transition-colors animate-slide-up"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
+                    <TableCell className="font-medium">#{receipt.id}</TableCell>
                     <TableCell>{receipt.metadata.equipment_name || t('common.notAvailable', 'N/A')}</TableCell>
                     <TableCell>
                       {receipt.metadata.booking_dates ? (
@@ -200,11 +204,11 @@ const ReceiptHistory = () => {
                         t('common.notAvailable', 'N/A')
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="font-semibold text-primary">
                       {formatAmount(Number(receipt.amount))}
                     </TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.className}`}>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusInfo.className}`}>
                         {statusInfo.text}
                       </span>
                     </TableCell>
@@ -214,7 +218,7 @@ const ReceiptHistory = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => handleDownload(receipt.id)}
-                        className="inline-flex items-center gap-2"
+                        className="inline-flex items-center gap-2 hover:bg-primary/10 transition-all"
                       >
                         <Download className="h-4 w-4" />
                         {t('receipts.download', 'Download')}

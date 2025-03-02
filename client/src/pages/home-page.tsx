@@ -62,20 +62,20 @@ export default function HomePage() {
     <div>
       <MainNav />
       <main>
-        {/* Hero Section - remains unchanged */}
-        <section className="py-20 bg-[#66BB6A] text-white">
+        {/* Hero Section - with animations */}
+        <section className="py-20 bg-gradient-to-r from-primary to-primary/80 text-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-5xl font-bold mb-6">
+            <h1 className="text-5xl font-bold mb-6 animate-fade-in">
               {t('home.hero.title')}
             </h1>
-            <p className="text-xl mb-8">
+            <p className="text-xl mb-8 animate-slide-up">
               {t('home.hero.subtitle')}
             </p>
             <Button
               asChild
               size="lg"
               variant="secondary"
-              className="bg-[#FFE57F] hover:bg-[#FFD740] text-black"
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground button-pulse shadow-lg"
             >
               <Link href="/equipment">{t('common.getStarted')}</Link>
             </Button>
@@ -90,39 +90,50 @@ export default function HomePage() {
             </h2>
             {allEquipment.length > 0 ? (
               <div className="grid md:grid-cols-3 gap-8">
-                {allEquipment.slice(0, 3).map((item) => (
+                {allEquipment.slice(0, 3).map((item, index) => (
                   <div
                     key={item.id}
-                    className={`bg-white rounded-lg shadow-md overflow-hidden ${
+                    className={`equipment-card card-gradient rounded-lg shadow-custom overflow-hidden ${
                       !item.availability ? 'opacity-75' : ''
-                    }`}
+                    } animate-slide-up`}
+                    style={{ animationDelay: `${index * 0.15}s` }}
                   >
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-xl font-semibold">{item.name}</h3>
-                        <Badge variant={item.availability ? "success" : "destructive"}>
-                          {item.availability ? (
+                    <div className="relative overflow-hidden">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-full h-48 object-cover transition-transform duration-700 hover:scale-110"
+                      />
+                      {item.availability && (
+                        <div className="absolute top-2 right-2">
+                          <Badge variant="success" className="animate-pulse-soft">
                             <CheckCircle className="w-4 h-4 mr-1" />
-                          ) : (
+                            {t('equipment.available')}
+                          </Badge>
+                        </div>
+                      )}
+                      {!item.availability && (
+                        <div className="absolute top-2 right-2">
+                          <Badge variant="destructive">
                             <XCircle className="w-4 h-4 mr-1" />
-                          )}
-                          {t(item.availability ? 'equipment.available' : 'equipment.unavailable')}
-                        </Badge>
+                            {t('equipment.unavailable')}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-6">
+                      <div className="mb-4">
+                        <h3 className="text-xl font-semibold">{item.name}</h3>
                       </div>
-                      <p className="text-gray-600 mb-4">{item.description}</p>
+                      <p className="text-muted-foreground mb-4">{item.description}</p>
                       <div className="flex justify-between items-center">
-                        <span className="text-[#66BB6A] font-bold">
+                        <span className="text-primary font-bold">
                           ₹{new Intl.NumberFormat('hi-IN').format(item.dailyRate)} {t('equipment.perDay')}
                         </span>
                         <Button
                           asChild
                           variant={item.availability ? "default" : "secondary"}
-                          className={`${item.availability ? "bg-[#66BB6A] hover:bg-[#558B2F]" : ""}`}
+                          className={`${item.availability ? "bg-primary hover:bg-primary/90" : ""} transition-all duration-300`}
                           disabled={!item.availability}
                         >
                           <Link href={`/equipment/${item.id}`}>
@@ -159,36 +170,36 @@ export default function HomePage() {
               {t('home.whyChooseUs.subtitle')}
             </p>
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-gray-50 rounded-lg p-6 text-center">
-                <div className="text-[#66BB6A] mb-4">
+              <div className="bg-card rounded-lg p-8 text-center shadow-custom hover-lift">
+                <div className="text-primary mb-4 bg-primary/10 p-4 rounded-full inline-block">
                   <IndianRupee className="w-12 h-12 mx-auto" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">
                   {t('home.whyChooseUs.affordablePrices')}
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   {t('home.whyChooseUs.affordablePricesDesc')}
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-6 text-center">
-                <div className="text-[#66BB6A] mb-4">
+              <div className="bg-card rounded-lg p-8 text-center shadow-custom hover-lift" style={{ animationDelay: '0.15s' }}>
+                <div className="text-primary mb-4 bg-primary/10 p-4 rounded-full inline-block">
                   <ShieldCheck className="w-12 h-12 mx-auto" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">
                   {t('home.whyChooseUs.verifiedEquipment')}
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   {t('home.whyChooseUs.verifiedEquipmentDesc')}
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-6 text-center">
-                <div className="text-[#66BB6A] mb-4">
+              <div className="bg-card rounded-lg p-8 text-center shadow-custom hover-lift" style={{ animationDelay: '0.3s' }}>
+                <div className="text-primary mb-4 bg-primary/10 p-4 rounded-full inline-block">
                   <HeadphonesIcon className="w-12 h-12 mx-auto" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">
                   {t('home.whyChooseUs.support')}
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   {t('home.whyChooseUs.supportDesc')}
                 </p>
               </div>
@@ -219,30 +230,38 @@ export default function HomePage() {
                   village: t('locations.phulambri'),
                   image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=500&h=500&fit=crop",
                 },
-              ].map((item) => (
+              ].map((item, index) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-lg shadow-md p-6"
+                  className="bg-card rounded-lg shadow-custom p-6 animate-slide-up hover-lift"
+                  style={{ animationDelay: `${index * 0.15}s` }}
                 >
-                  <img
-                    src={item.image}
-                    alt={t('home.testimonials.farmIn', { village: item.village })}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                  />
-                  <p className="text-gray-600 mb-4">
-                    {t('home.testimonials.quote')}
+                  <div className="relative overflow-hidden rounded-lg mb-4">
+                    <img
+                      src={item.image}
+                      alt={t('home.testimonials.farmIn', { village: item.village })}
+                      className="w-full h-48 object-cover transition-transform duration-700 hover:scale-110"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/80 to-transparent p-2">
+                      <p className="text-white text-sm font-semibold">{item.village}</p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground mb-4 italic border-l-4 border-primary/30 pl-4">
+                    "{t('home.testimonials.quote')}"
                   </p>
                   <div className="flex items-center">
-                    <img
-                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${item.village}`}
-                      alt={t('home.testimonials.farmerFrom', { village: item.village })}
-                      className="w-12 h-12 rounded-full mr-4"
-                    />
+                    <div className="w-12 h-12 rounded-full mr-4 overflow-hidden border-2 border-primary p-1">
+                      <img
+                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${item.village}`}
+                        alt={t('home.testimonials.farmerFrom', { village: item.village })}
+                        className="w-full h-full rounded-full"
+                      />
+                    </div>
                     <div>
                       <h4 className="font-semibold">
                         {t('home.testimonials.farmer')}
                       </h4>
-                      <p className="text-gray-500">{item.village}</p>
+                      <p className="text-muted-foreground text-sm">{item.village}</p>
                     </div>
                   </div>
                 </div>
@@ -252,19 +271,19 @@ export default function HomePage() {
         </section>
 
         {/* Call to Action Section */}
-        <section className="py-16 bg-[#66BB6A] text-white text-center">
+        <section className="py-20 bg-gradient-to-r from-primary to-primary/80 text-white text-center">
           <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold mb-4">
+            <h2 className="text-4xl font-bold mb-4 animate-fade-in">
               {t('home.cta.title')}
             </h2>
-            <p className="text-xl mb-8">
+            <p className="text-xl mb-10 animate-slide-up">
               {t('home.cta.subtitle')}
             </p>
             <Button
               asChild
               size="lg"
               variant="secondary"
-              className="bg-[#FFE57F] hover:bg-[#FFD740] text-black"
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground button-pulse shadow-lg px-8 py-6 text-lg"
             >
               <Link href="/auth">{t('common.signUpNow')}</Link>
             </Button>

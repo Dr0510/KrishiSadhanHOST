@@ -179,9 +179,9 @@ export function MapView({
   }, [t, toast, onLocationSelect]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">{t('equipment.availableEquipment')}</h2>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">{t('equipment.availableEquipment')}</h2>
         <div className="flex gap-2">
           {viewMode === 'map' && (
             <Button
@@ -195,7 +195,7 @@ export function MapView({
                 setMapKey(k => k + 1);
                 setIsMapLoading(true);
               }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:bg-primary/10 transition-all duration-300"
             >
               <RotateCcw className="h-4 w-4" />
               <span>{t('map.clear', 'Clear')}</span>
@@ -210,7 +210,7 @@ export function MapView({
               setMapKey(k => k + 1);
               setTimeout(() => setIsViewChanging(false), 500);
             }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 hover:bg-secondary/10 transition-all duration-300"
           >
             {viewMode === 'map' ? (
               <>
@@ -347,31 +347,37 @@ export function MapView({
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {equipment.map((item) => (
-            <Card key={item.id} className="p-4 hover:shadow-lg transition-shadow">
-              <div className="aspect-video rounded-md overflow-hidden mb-4">
+          {equipment.map((item, index) => (
+            <Card 
+              key={item.id} 
+              className="p-4 equipment-card shadow-custom animate-slide-up"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className="aspect-video rounded-md overflow-hidden mb-4 relative">
                 <img
                   src={item.imageUrl}
                   alt={item.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
                 />
+                <div className="absolute top-2 right-2">
+                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                    item.availability
+                      ? 'text-green-700 bg-green-100'
+                      : 'text-red-700 bg-red-100'
+                  } ${item.availability ? 'animate-pulse-soft' : ''}`}>
+                    {item.availability ? t('equipment.available') : t('equipment.unavailable')}
+                  </span>
+                </div>
               </div>
               <h3 className="font-semibold text-lg mb-2">{item.name}</h3>
-              <p className="text-sm text-gray-600 mb-2">
+              <p className="text-sm text-muted-foreground mb-3">
                 {item.description}
               </p>
-              <div className="flex items-center justify-between">
-                <span className="font-bold">₹{item.dailyRate}/day</span>
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                  item.availability
-                    ? 'text-green-700 bg-green-100'
-                    : 'text-red-700 bg-red-100'
-                }`}>
-                  {item.availability ? t('equipment.available') : t('equipment.unavailable')}
-                </span>
+              <div className="flex items-center justify-between mb-4">
+                <span className="font-bold text-primary text-lg">₹{new Intl.NumberFormat('hi-IN').format(item.dailyRate)}/day</span>
               </div>
               <Button
-                className="w-full mt-4"
+                className="w-full mt-2 transition-all duration-300 bg-primary hover:bg-primary/90"
                 onClick={() => onMarkerClick?.(item)}
               >
                 {t('equipment.viewDetails')}

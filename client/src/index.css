@@ -1,3 +1,228 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 148 30% 97%;
+    --foreground: 140 10% 10%;
+
+    --muted: 148 10% 90%;
+    --muted-foreground: 140 5% 45%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 140 10% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 140 10% 10%;
+
+    --border: 148 15% 85%;
+    --input: 148 15% 85%;
+
+    --primary: 142 70% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 90% 65%;
+    --secondary-foreground: 140 10% 10%;
+
+    --accent: 148 60% 90%;
+    --accent-foreground: 142 70% 30%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --chart-1: 142 70% 40%;
+    --chart-2: 40 90% 65%;
+    --chart-3: 200 70% 50%;
+    --chart-4: 320 70% 50%;
+    --chart-5: 270 70% 50%;
+
+    --ring: 142 70% 40%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 140 15% 15%;
+    --foreground: 0 0% 95%;
+
+    --muted: 140 10% 25%;
+    --muted-foreground: 140 5% 65%;
+
+    --popover: 140 20% 20%;
+    --popover-foreground: 0 0% 95%;
+
+    --card: 140 20% 20%;
+    --card-foreground: 0 0% 95%;
+
+    --border: 140 15% 30%;
+    --input: 140 15% 30%;
+
+    --primary: 142 70% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 90% 65%;
+    --secondary-foreground: 140 10% 10%;
+
+    --accent: 140 15% 25%;
+    --accent-foreground: 0 0% 95%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 95%;
+
+    --ring: 142 70% 40%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Animation Utility Classes */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInRight 0.5s ease-out;
+  }
+  
+  .animate-pulse-soft {
+    animation: pulseSoft 2s infinite;
+  }
+  
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulseSoft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Custom Card Styling */
+.card-gradient {
+  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--accent)) 100%);
+  transition: all 0.3s ease;
+}
+
+.card-gradient:hover {
+  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--primary)/0.2) 100%);
+}
+
+/* Custom shadow effects */
+.shadow-custom {
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-custom-hover:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Button animations */
+.button-pulse {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-pulse::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: inherit;
+  transform: scale(0);
+  transition: transform 0.5s ease;
+}
+
+.button-pulse:hover::after {
+  transform: scale(2);
+  opacity: 0;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary)/0.5);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary)/0.8);
+}
+
+/* Card hover effects */
+.equipment-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.equipment-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.15);
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
