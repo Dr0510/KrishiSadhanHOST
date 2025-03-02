@@ -59,6 +59,20 @@ export default function EquipmentFormMap({ initialLocation, onLocationSelect }: 
 
           // Store city name in local storage for form reference
           localStorage.setItem('lastSelectedLocation', locationName);
+          
+          // Dispatch a custom event with both location name and coordinates
+          const event = new CustomEvent('locationSelected', { 
+            detail: { 
+              locationName: locationName, 
+              coordinates: newLocation 
+            } 
+          });
+          window.dispatchEvent(event);
+          
+          console.log('Dispatched location event:', {
+            locationName,
+            coordinates: newLocation
+          });
 
           // Dispatch a custom event so the main form can update its location field
           const event = new CustomEvent('locationSelected', { 

@@ -220,17 +220,34 @@ export function MapView({
             {equipment
               .filter(item => item.location)
               .map(item => {
-                const cityName = item.location!.toLowerCase().trim();
-                const coordinates = cityCoordinates[cityName];
+                // First check if item has direct latitude/longitude
+                let markerPosition: [number, number] | null = null;
+                
+                if (item.latitudeCoord && item.longitudeCoord) {
+                  const lat = parseFloat(item.latitudeCoord);
+                  const lng = parseFloat(item.longitudeCoord);
+                  if (!isNaN(lat) && !isNaN(lng)) {
+                    markerPosition = [lat, lng];
+                    console.log(`Using stored coordinates for ${item.name}:`, markerPosition);
+                  }
+                }
+                
+                // If no coordinates, fall back to city map
+                if (!markerPosition) {
+                  const cityName = item.location!.toLowerCase().trim();
+                  markerPosition = cityCoordinates[cityName] || null;
+                  console.log(`Using city coordinates for ${item.name}:`, markerPosition);
+                }
 
-                if (!coordinates) {
+                if (!markerPosition) {
+                  console.log(`No coordinates found for ${item.name} at ${item.location}`);
                   return null;
                 }
 
                 return (
                   <Marker
                     key={item.id}
-                    position={coordinates}
+                    position={markerPosition}
                     icon={createCustomIcon(item.dailyRate)}
                     eventHandlers={{
                       click: () => onMarkerClick?.(item)

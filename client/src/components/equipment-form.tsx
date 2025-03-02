@@ -126,10 +126,30 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
 
   // Handle map location selection
   const handleLocationSelect = (lat: number, lng: number) => {
-    setCoordinates({ lat, lng });
+    console.log('Location coordinates selected:', lat, lng);
     form.setValue('latitudeCoord', lat);
     form.setValue('longitudeCoord', lng);
+    setCoordinates({lat, lng});
   };
+
+  // Listen for location changes from the map component
+  useEffect(() => {
+    const handleLocationEvent = (event: any) => {
+      if (event.detail) {
+        console.log('Location selected event:', event.detail);
+        if (event.detail.locationName) {
+          form.setValue('location', event.detail.locationName);
+        }
+        if (event.detail.coordinates) {
+          form.setValue('latitudeCoord', event.detail.coordinates.lat);
+          form.setValue('longitudeCoord', event.detail.coordinates.lng);
+          setCoordinates(event.detail.coordinates);
+        }
+      }
+    };
+    window.addEventListener('locationSelected', handleLocationEvent);
+    return () => window.removeEventListener('locationSelected', handleLocationEvent);
+  }, [form]);
 
   // Handle form submission
   const handleSubmit = async (values: EquipmentFormValues) => {

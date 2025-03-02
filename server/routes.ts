@@ -221,10 +221,13 @@ export function registerRoutes(app: Express): Server {
       
       // If no direct coordinates, try to find from city map
       if (!coordinates && location) {
+        // Normalize location for comparison
+        const normalizedLocation = location.toLowerCase().trim();
+        
         // Try different location formats in the city map
-        coordinates = cityCoordinates[location] || 
-                      cityCoordinates[location.replace('.', '')] || // Try without period
-                      cityCoordinates[location.replace(' ', '')] || // Try without space
+        coordinates = cityCoordinates[normalizedLocation] || 
+                      cityCoordinates[normalizedLocation.replace('.', '')] || // Try without period
+                      cityCoordinates[normalizedLocation.replace(' ', '')] || // Try without space
                       null;
                       
         if (coordinates) {
@@ -240,9 +243,9 @@ export function registerRoutes(app: Express): Server {
             
             Object.keys(cityCoordinates).forEach(city => {
               // Simple similarity check - if location is substring of city or vice versa
-              if (city.includes(location) || location.includes(city)) {
-                const similarity = Math.min(city.length, location.length) / 
-                                  Math.max(city.length, location.length);
+              if (city.includes(normalizedLocation) || normalizedLocation.includes(city)) {
+                const similarity = Math.min(city.length, normalizedLocation.length) / 
+                                  Math.max(city.length, normalizedLocation.length);
                 if (similarity > maxSimilarity) {
                   maxSimilarity = similarity;
                   bestMatch = city;
