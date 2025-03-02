@@ -312,9 +312,11 @@ export function MainNav() {
           </Sheet>
 
           <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-2 text-xl font-bold text-green-700">
-              <Tractor className="h-6 w-6" />
-              {t('branding.name', 'AgriRent')}
+            <Link href="/" className="flex items-center gap-2">
+              <Tractor className="h-7 w-7 text-green-600" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-green-700 to-green-500 bg-clip-text text-transparent font-serif tracking-wide">
+                {t('branding.name', 'KrishiSadhan')}
+              </span>
             </Link>
             {location !== "/" && (
               <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
