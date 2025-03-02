@@ -17,14 +17,13 @@ import { MainNav } from "@/components/main-nav";
 import { useToast } from "@/hooks/use-toast";
 
 const formatAmount = (amountInPaise: number) => {
-  // Convert paise to rupees by dividing by 100
-  const amountInRupees = amountInPaise / 100;
+  // Display amount as is without converting from paise to rupees
   return new Intl.NumberFormat('hi-IN', {
     style: 'currency',
     currency: 'INR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
-  }).format(amountInRupees);
+  }).format(amountInPaise);
 };
 
 const ReceiptHistory = () => {
