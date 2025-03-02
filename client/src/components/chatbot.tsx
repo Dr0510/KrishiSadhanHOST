@@ -13,7 +13,7 @@ interface Message {
   timestamp: Date;
 }
 
-// Initialize Gemini AI
+// Initialize Gemini AI with proper environment variable
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_AI_API_KEY);
 
 export function Chatbot() {
@@ -21,7 +21,7 @@ export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
-      content: "Hello! How can I help you with farm equipment rental today?",
+      content: t('chatbot.welcome', "Hello! How can I help you with farm equipment rental today?"),
       sender: 'bot',
       timestamp: new Date()
     }
@@ -57,7 +57,7 @@ export function Chatbot() {
       return response.text();
     } catch (error) {
       console.error('Error fetching Gemini response:', error);
-      return "I apologize, but I'm having trouble connecting to my knowledge base right now. Please try again later or contact our support team for immediate assistance.";
+      throw error;
     }
   };
 
@@ -88,7 +88,7 @@ export function Chatbot() {
       console.error('Chat error:', error);
       // Add error message to chat
       const errorMessage: Message = {
-        content: "I'm sorry, I encountered an error. Please try again later.",
+        content: t('chatbot.error', "I'm sorry, but I'm having trouble connecting right now. Please try again later or contact our support team for immediate assistance."),
         sender: 'bot',
         timestamp: new Date()
       };
@@ -112,7 +112,7 @@ export function Chatbot() {
   return (
     <Card className="fixed bottom-4 right-4 w-80 h-96 shadow-xl flex flex-col">
       <div className="p-3 border-b flex justify-between items-center bg-primary text-primary-foreground">
-        <h3 className="font-semibold">Farm Equipment Assistant</h3>
+        <h3 className="font-semibold">{t('chatbot.title', 'Farm Equipment Assistant')}</h3>
         <div className="flex gap-2">
           <Button
             variant="ghost"
@@ -128,7 +128,7 @@ export function Chatbot() {
             className="h-8 w-8"
             onClick={() => {
               setMessages([{
-                content: "Hello! How can I help you with farm equipment rental today?",
+                content: t('chatbot.welcome', "Hello! How can I help you with farm equipment rental today?"),
                 sender: 'bot',
                 timestamp: new Date()
               }]);
