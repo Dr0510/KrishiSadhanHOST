@@ -16,6 +16,17 @@ import type { Receipt } from "@shared/schema";
 import { MainNav } from "@/components/main-nav";
 import { useToast } from "@/hooks/use-toast";
 
+interface ReceiptWithMetadata extends Receipt {
+  metadata: {
+    equipment_name?: string;
+    booking_dates?: {
+      start: string;
+      end: string;
+    };
+    payment_method?: string;
+  };
+}
+
 const ReceiptHistory = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -24,7 +35,7 @@ const ReceiptHistory = () => {
     data: receipts,
     isLoading,
     error,
-  } = useQuery<Receipt[]>({
+  } = useQuery<ReceiptWithMetadata[]>({
     queryKey: ["/api/receipts"],
     queryFn: async () => {
       const response = await fetch("/api/receipts", {
@@ -34,9 +45,7 @@ const ReceiptHistory = () => {
         const error = await response.json();
         throw new Error(error.message || "Failed to fetch receipts");
       }
-      const data = await response.json();
-      console.log('Receipt data:', data); // Debug log
-      return data;
+      return response.json();
     },
   });
 
@@ -85,20 +94,11 @@ const ReceiptHistory = () => {
         throw new Error("Failed to download receipt");
       }
 
-      const contentDisposition = response.headers.get("Content-Disposition");
-      let filename = `receipt-${receiptId}.pdf`;
-      if (contentDisposition) {
-        const matches = /filename=([^;]+)/gi.exec(contentDisposition);
-        if (matches?.length) {
-          filename = matches[1].replace(/["']/g, "");
-        }
-      }
-
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = filename;
+      a.download = `receipt-${receiptId}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -245,7 +245,7 @@ const ReceiptHistory = () => {
                       )}
                     </TableCell>
                     <TableCell className="font-semibold text-primary">
-                      ₹{receipt.totalPrice.toLocaleString()}
+                      ₹{(receipt.amount / 100).toLocaleString()}
                     </TableCell>
                     <TableCell>
                       <span
