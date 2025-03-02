@@ -202,7 +202,7 @@ const ReceiptHistory = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      {formatAmount(receipt.amount)}
+                      {formatAmount(Number(receipt.amount))}
                     </TableCell>
                     <TableCell>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.className}`}>

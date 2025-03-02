@@ -792,7 +792,7 @@ export function registerRoutes(app: Express): Server {
       const receipt = await storage.createReceipt({
         bookingId: booking.id,
         userId: booking.userId,
-        amount: booking.totalPrice * 100, // Amount in paise
+        amount: booking.totalPrice * 100, // Amount in paise (multiply by 100 to convert from rupees)
         status: 'paid',
         razorpayPaymentId: razorpay_payment_id,
         metadata: {
@@ -1504,7 +1504,7 @@ export function registerRoutes(app: Express): Server {
              style: 'currency',
              currency: 'INR',
              maximumFractionDigits: 0
-           }).format(receipt.amount / 100),
+           }).format(receipt.amount / 100), // Convert paise to rupees for display
            60,
            boxTop + 12,
            { align: 'right', width: 475 }
