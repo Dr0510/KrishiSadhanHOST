@@ -433,6 +433,30 @@ export function registerRoutes(app: Express): Server {
             updateData.latitudeCoord = coordinates[0].toString();
             updateData.longitudeCoord = coordinates[1].toString();
             console.log('Updated coordinates for location:', location, coordinates);
+          } else {
+            console.log('No coordinates found for location:', location);
+            
+            // Try fuzzy matching for better location mapping
+            let bestMatch = '';
+            let maxSimilarity = 0;
+            
+            Object.keys(cityCoordinates).forEach(city => {
+              if (city.includes(location) || location.includes(city)) {
+                const similarity = Math.min(city.length, location.length) / 
+                                  Math.max(city.length, location.length);
+                if (similarity > maxSimilarity) {
+                  maxSimilarity = similarity;
+                  bestMatch = city;
+                }
+              }
+            });
+            
+            if (bestMatch && maxSimilarity > 0.5) {
+              const fuzzyCoordinates = cityCoordinates[bestMatch];
+              updateData.latitudeCoord = fuzzyCoordinates[0].toString();
+              updateData.longitudeCoord = fuzzyCoordinates[1].toString();
+              console.log(`Found fuzzy match for "${location}": "${bestMatch}"`, fuzzyCoordinates);
+            }
           }
         }
       }

@@ -100,6 +100,19 @@ export function MapView({
       });
     }
   }, [equipment, viewMode]);
+  
+  // Add a specialized effect for checking coordinate changes
+  useEffect(() => {
+    // This effect specifically watches for coordinate changes in equipment
+    const coordinatesChanged = equipment.some(item => 
+      item.latitudeCoord || item.longitudeCoord
+    );
+    
+    if (coordinatesChanged && viewMode === 'map') {
+      console.log("Equipment coordinates changed, refreshing map");
+      setMapKey(prev => prev + 1);
+    }
+  }, [equipment.map(item => `${item.id}-${item.latitudeCoord}-${item.longitudeCoord}`).join(','), viewMode]);
 
   const createCustomIcon = useCallback((dailyRate: number) => {
     return L.divIcon({

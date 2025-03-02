@@ -175,40 +175,14 @@ export function EquipmentForm({ equipment, onSubmit, isSubmitting = false }: Equ
     // Add specs
     formData.append('specs', JSON.stringify(specs));
 
-    // Add coordinates if available
+    // Add coordinates if available - ALWAYS send coordinates if available
     if (coordinates) {
+      console.log('Sending coordinates to server:', coordinates);
       formData.append('latitudeCoord', coordinates.lat.toString());
       formData.append('longitudeCoord', coordinates.lng.toString());
-    } else if (values.location) {
-        // Try to get coordinates from the city map if user entered a location but didn't select on map
-        const cityCoordinates: Record<string, [number, number]> = {
-          'pune': [18.5204, 73.8567],
-          'mumbai': [19.0760, 72.8777],
-          'delhi': [28.6139, 77.2090],
-          'bangalore': [12.9716, 77.5946],
-          'hyderabad': [17.3850, 78.4867],
-          'chennai': [13.0827, 80.2707],
-          'kolkata': [22.5726, 88.3639],
-          'ahmedabad': [23.0225, 72.5714],
-          'latur': [18.4088, 76.5604],
-          'nilanga': [18.1177, 76.7506],
-          'aurangabad': [19.8762, 75.3433],
-          'chh. sambhajinagar': [19.8762, 75.3433],
-          'nagpur': [21.1458, 79.0882],
-          'nashik': [19.9975, 73.7898],
-          'barshi': [18.2333, 75.6833],
-        };
-
-        const locationKey = values.location.toLowerCase().trim();
-        const coordinates = cityCoordinates[locationKey];
-
-        if (coordinates) {
-          formData.append('latitudeCoord', coordinates[0].toString());
-          formData.append('longitudeCoord', coordinates[1].toString());
-          console.log('Adding coordinates for location from city map:', locationKey, coordinates);
-        }
-      }
-
+    } else {
+      console.log('No coordinates available for location:', values.location);
+    }
 
     try {
       await onSubmit(formData);

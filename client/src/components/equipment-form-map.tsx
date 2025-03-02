@@ -46,7 +46,11 @@ export default function EquipmentFormMap({ initialLocation, onLocationSelect }: 
   const handleMapClick = (latLng: L.LatLng) => {
     const newLocation = { lat: latLng.lat, lng: latLng.lng };
     setMarker(newLocation);
+    
+    // Call location select callback with coordinates
     onLocationSelect(newLocation.lat, newLocation.lng);
+    
+    console.log('Map location selected:', newLocation);
 
     // Try to find nearest city for user reference
     fetchNearestLocation(newLocation.lat, newLocation.lng)
