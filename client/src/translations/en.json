@@ -281,10 +281,36 @@
   },
   "booking": {
     "selectDates": "Select Rental Dates",
-    "selectDatesDescription": "Choose your rental start and end dates. Available dates are shown in green.",
-    "confirm": "Confirm Booking",
-    "totalPrice": "Total Price",
-    "downloadReceipt": "Download Receipt"
+    "selectDatesDescription": "Choose your start and end dates for renting this equipment.",
+    "missingInfo": "Missing booking information",
+    "invalidDateRange": "End date must be after start date",
+    "failed": "Failed to create booking",
+    "pastDateError": "Cannot select dates in the past",
+    "details": "Booking Details",
+    "notFound": "Booking not found",
+    "noAccess": "You don't have access to this booking or it doesn't exist.",
+    "summary": "Booking Summary",
+    "dates": "Booking Dates",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "days": "Days",
+    "total": "Total Amount",
+    "downloadReceipt": "Download Receipt",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "paid": "Paid",
+      "awaiting_payment": "Awaiting Payment",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "yourBookings": "Your Bookings",
+    "booking": "Booking",
+    "totalPrice": "Total Price"
   },
   "review": {
     "title": "Rate Your Experience",
@@ -383,5 +409,19 @@
       "availability": "Check equipment availability"
     },
     "helpText": "I can help you with equipment rentals, pricing, availability, and booking assistance."
+  },
+  "reviews": {
+    "title": "Customer Reviews",
+    "none": "No reviews yet",
+    "count_one": "{{count}} review",
+    "count_other": "{{count}} reviews",
+    "writeReview": "Write a Review",
+    "addReview": "Add Your Review",
+    "rating": "Rating",
+    "comment": "Comment",
+    "submit": "Submit Review",
+    "success": "Review submitted successfully",
+    "error": "Failed to submit review",
+    "loginRequired": "Please login to write a review"
   }
 }

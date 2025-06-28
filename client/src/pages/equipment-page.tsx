@@ -493,20 +493,23 @@ export default function EquipmentPage() {
               <div className="border rounded-lg p-4 bg-muted/50">
                 <h4 className="font-medium mb-2">{t('booking.summary', 'Booking Summary')}</h4>
                 <div className="space-y-1 text-sm">
-                  <p><span className="font-medium">{t('equipment.name')}:</span> {equipment.name}</p>
-                  <p><span className="font-medium">{t('booking.dates')}:</span> {startDate && endDate && `${format(startDate, 'PP')} - ${format(endDate, 'PP')}`}</p>
+                  <p><span className="font-medium">{t('equipment.name', 'Equipment')}:</span> {equipment.name}</p>
+                  <p><span className="font-medium">{t('booking.dates', 'Dates')}:</span> {bookingData.booking.startDate && bookingData.booking.endDate && `${format(new Date(bookingData.booking.startDate), 'PP')} - ${format(new Date(bookingData.booking.endDate), 'PP')}`}</p>
+                  <p><span className="font-medium">{t('booking.total', 'Total')}:</span> ₹{bookingData.booking.totalPrice}</p>
                 </div>
               </div>
               <PaymentGateway
                 bookingId={bookingData.booking.id}
                 totalPrice={bookingData.booking.totalPrice}
+                razorpayOrderId={bookingData.booking.razorpayOrderId}
+                userData={user ? { name: user.name, email: user.email, phone: user.phone } : {}}
                 onSuccess={() => {
                   setShowPaymentGateway(false);
                   setLocation('/dashboard');
                 }}
                 onError={(error) => {
                   toast({
-                    title: t('payment.failed'),
+                    title: t('payment.failed', 'Payment Failed'),
                     description: error.message,
                     variant: "destructive",
                   });
