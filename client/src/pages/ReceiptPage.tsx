@@ -151,12 +151,14 @@ export default function ReceiptPage() {
                 </p>
                 <p className="text-muted-foreground">
                   {t('receipt.status', 'Status')}: 
-                  <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                     receipt.status === 'paid' 
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-green-100 text-green-800 border-green-200'
+                      : 'bg-yellow-100 text-yellow-800 border-yellow-200'
                   }`}>
-                    {receipt.status}
+                    {receipt.status === 'paid' && <span className="text-green-600 mr-1">✓</span>}
+                    {receipt.status === 'pending' && <span className="text-yellow-600 mr-1">⏳</span>}
+                    {receipt.status.charAt(0).toUpperCase() + receipt.status.slice(1)}
                   </span>
                 </p>
               </div>

@@ -158,7 +158,18 @@ export default function BookingPage() {
                   </p>
                   <p>
                     <span className="font-semibold">{t('booking.status')}:</span>{' '}
-                    <span className="capitalize">{t(`booking.status.${booking.status}`)}</span>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${
+                    booking.status === 'paid' 
+                      ? 'bg-green-100 text-green-800 border-green-200'
+                      : booking.status === 'pending' || booking.status === 'awaiting_payment'
+                      ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                      : 'bg-red-100 text-red-800 border-red-200'
+                  }`}>
+                    {booking.status === 'paid' && <span className="text-green-600 mr-1">✓</span>}
+                    {(booking.status === 'pending' || booking.status === 'awaiting_payment') && <span className="text-yellow-600 mr-1">⏳</span>}
+                    {booking.status === 'payment_failed' && <span className="text-red-600 mr-1">✗</span>}
+                    {t(`booking.status.${booking.status.toLowerCase()}`)}
+                  </span>
                   </p>
 
                   {booking.status === 'paid' && (
