@@ -1305,6 +1305,11 @@ export function registerRoutes(app: Express): Server {
       // Pipe the PDF document to the response stream
       doc.pipe(res);
 
+      // Helper function to format currency consistently with proper styling
+      const formatAmount = (amount) => {
+        return `₹${Math.floor(amount / 100).toLocaleString('en-IN')}`;
+      };
+
       // Professional PDF Content Generation
       const pageWidth = 595.28; // A4 width in points
       const margin = 40;
@@ -1467,11 +1472,6 @@ export function registerRoutes(app: Express): Server {
          .text('Total Days:', margin + 15, 405)
          .font('Helvetica')
          .text(`${rentalDays} day(s)`, margin + 120, 405);
-
-      // Helper function to format currency consistently with proper styling
-      const formatAmount = (amount) => {
-        return `₹${Math.floor(amount / 100).toLocaleString('en-IN')}`;
-      };
 
       // Payment Summary Section
       doc.fillColor('#2c3e50')
