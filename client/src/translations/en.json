@@ -368,5 +368,20 @@
   "map": {
     "listView": "List View",
     "loading": "Loading map..."
+  },
+  "chatbot": {
+    "title": "Farm Equipment Assistant",
+    "welcome": "Hello! How can I help you with farm equipment rental today?",
+    "inputPlaceholder": "Type your message...",
+    "error": "I'm sorry, but I'm having trouble connecting right now. Please try again later or contact our support team for immediate assistance.",
+    "typing": "Assistant is typing...",
+    "quickHelp": "Quick Help",
+    "suggestions": {
+      "findEquipment": "Find equipment for my farm",
+      "bookingProcess": "How do I book equipment?",
+      "pricing": "What are the rental prices?",
+      "availability": "Check equipment availability"
+    },
+    "helpText": "I can help you with equipment rentals, pricing, availability, and booking assistance."
   }
 }

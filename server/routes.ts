@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { createPaymentSession, verifyPaymentSignature, generateReceipt } from "./payment";
 import crypto from 'crypto';
 import PDFDocument from 'pdfkit';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Configure cloudinary
 import { v2 as cloudinary } from 'cloudinary';
@@ -1607,6 +1608,78 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({
         error: "Failed to fetch reviews",
         details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Chatbot endpoint using Gemini API
+  app.post("/api/chatbot", async (req, res) => {
+    try {
+      const { message } = req.body;
+      
+      if (!message || typeof message !== 'string') {
+        return res.status(400).json({ error: 'Message is required' });
+      }
+
+      const apiKey = process.env.GOOGLE_AI_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ error: 'Google AI API key not configured' });
+      }
+
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      // Create a comprehensive system prompt for farm equipment rental context
+      const systemPrompt = `You are a helpful farm equipment rental assistant for KrishiSadhan, an agricultural equipment rental platform. You help farmers and agricultural workers with:
+
+MAIN SERVICES:
+- Finding suitable farm equipment for rent (tractors, harvesters, tillers, sprayers, seeders, cultivators, threshers, irrigation systems, rotavators)
+- Understanding rental prices, availability, and booking process
+- Equipment specifications, usage guidance, and recommendations
+- Customer support for the rental platform
+
+PLATFORM FEATURES:
+- Equipment search and filtering by category, location, price range
+- Online booking with payment gateway integration
+- Multi-language support (English, Hindi, Marathi)
+- Equipment comparison tools
+- Reviews and ratings system
+- Receipt and booking history
+
+GUIDELINES:
+- Be helpful, friendly, and knowledgeable about farm equipment
+- Provide practical advice for agricultural needs
+- Keep responses concise but informative
+- Suggest specific equipment categories when relevant
+- Mention platform features that can help users
+- Use simple language appropriate for farmers
+- If asked about pricing, mention that rates vary by equipment and location
+
+User message: ${message}`;
+
+      const result = await model.generateContent(systemPrompt);
+      const response = await result.response;
+      const text = response.text();
+
+      res.json({ response: text });
+    } catch (error) {
+      console.error('Gemini API error:', error);
+      
+      // Handle specific Gemini API errors
+      let errorMessage = 'Failed to get response from AI assistant';
+      if (error instanceof Error) {
+        if (error.message.includes('overloaded')) {
+          errorMessage = 'Our AI assistant is currently busy. Please try again in a moment.';
+        } else if (error.message.includes('quota')) {
+          errorMessage = 'AI service quota reached. Please try again later.';
+        } else if (error.message.includes('API key')) {
+          errorMessage = 'AI service configuration issue. Please contact support.';
+        }
+      }
+      
+      res.status(500).json({ 
+        error: errorMessage,
+        details: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
