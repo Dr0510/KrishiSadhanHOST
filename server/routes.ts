@@ -290,12 +290,16 @@ export function registerRoutes(app: Express): Server {
         ownerId: req.user.id,
         imageUrl: imageResult.secure_url,
         availability: true,
-        latitudeCoord: coordinates ? coordinates[0] : null,
-        longitudeCoord: coordinates ? coordinates[1] : null
+        latitudeCoord: coordinates ? coordinates[0].toString() : null,
+        longitudeCoord: coordinates ? coordinates[1].toString() : null
       };
 
       const parsed = insertEquipmentSchema.safeParse(equipmentData);
       if (!parsed.success) {
+        console.error('Equipment validation failed:', {
+          data: equipmentData,
+          errors: parsed.error.errors
+        });
         return res.status(400).json({
           error: 'Validation failed',
           details: parsed.error.errors

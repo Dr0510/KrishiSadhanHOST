@@ -168,7 +168,9 @@ export const insertEquipmentSchema = createInsertSchema(equipment).omit({
     summer: true,
     autumn: true,
     winter: true
-  })
+  }),
+  latitudeCoord: z.string().nullable().optional(),
+  longitudeCoord: z.string().nullable().optional()
 });
 
 export const insertBookingSchema = createInsertSchema(bookings).omit({
