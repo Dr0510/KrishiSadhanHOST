@@ -8,13 +8,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Download, Loader2, Search, Filter, Eye, Calendar, CreditCard, FileText } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Receipt } from "@shared/schema";
 import { MainNav } from "@/components/main-nav";
 import { useToast } from "@/hooks/use-toast";
+import { useState, useMemo } from "react";
 
 interface ReceiptWithMetadata extends Receipt {
   metadata: {
@@ -30,6 +34,18 @@ interface ReceiptWithMetadata extends Receipt {
 const ReceiptHistory = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // Format amount in Indian Rupees with proper formatting
+  const formatRupees = (amount: number): string => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
 
   const {
     data: receipts,
@@ -48,6 +64,33 @@ const ReceiptHistory = () => {
       return response.json();
     },
   });
+
+  // Filter and search receipts
+  const filteredReceipts = useMemo(() => {
+    if (!receipts) return [];
+    
+    return receipts.filter((receipt) => {
+      const matchesSearch = searchTerm === "" || 
+        receipt.metadata?.equipment_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        receipt.id.toString().includes(searchTerm);
+      
+      const matchesStatus = statusFilter === "all" || receipt.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    });
+  }, [receipts, searchTerm, statusFilter]);
+
+  // Calculate analytics
+  const analytics = useMemo(() => {
+    if (!receipts) return { total: 0, totalAmount: 0, paidCount: 0, pendingCount: 0 };
+    
+    const total = receipts.length;
+    const totalAmount = receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
+    const paidCount = receipts.filter(r => r.status === 'paid').length;
+    const pendingCount = receipts.filter(r => r.status === 'pending').length;
+    
+    return { total, totalAmount, paidCount, pendingCount };
+  }, [receipts]);
 
   const getStatusInfo = (status: string) => {
     const statusDisplayMap: Record<
@@ -196,6 +239,130 @@ const ReceiptHistory = () => {
           {t("receipts.title", "Receipt History")}
         </h1>
 
+        {/* Analytics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Receipts</CardTitle>
+              <CreditCard className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analytics.total}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
+              <CreditCard className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{formatRupees(analytics.totalAmount)}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Paid</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{analytics.paidCount}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-600">{analytics.pendingCount}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Search and Filter */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search by equipment name or receipt ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border rounded-md px-3 py-2 bg-background"
+            >
+              <option value="all">All Status</option>
+              <option value="paid">Paid</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Results Count */}
+        <div className="flex justify-between items-center mb-4">
+          <p className="text-sm text-muted-foreground">
+            Showing {filteredReceipts.length} of {receipts?.length || 0} receipts
+          </p>
+          {filteredReceipts.length > 0 && (
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => {
+                const totalFiltered = filteredReceipts.reduce((sum, r) => sum + r.amount, 0);
+                toast({
+                  title: "Filtered Total",
+                  description: `Total amount: ${formatRupees(totalFiltered)}`,
+                });
+              }}>
+                <Eye className="h-4 w-4 mr-2" />
+                Show Filtered Total
+              </Button>
+              
+              <Button variant="outline" size="sm" onClick={() => {
+                const csvContent = [
+                  ['Receipt ID', 'Equipment', 'Amount', 'Status', 'Booking Period', 'Generated On'],
+                  ...filteredReceipts.map(receipt => [
+                    `#${receipt.id}`,
+                    receipt.metadata?.equipment_name || 'N/A',
+                    formatRupees(receipt.amount),
+                    receipt.status,
+                    receipt.metadata?.booking_dates 
+                      ? `${formatDate(receipt.metadata.booking_dates.start)} to ${formatDate(receipt.metadata.booking_dates.end)}`
+                      : 'N/A',
+                    formatDate(receipt.generatedAt)
+                  ])
+                ].map(row => row.join(',')).join('\n');
+                
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `receipts-${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                toast({
+                  title: "Export Complete",
+                  description: `Exported ${filteredReceipts.length} receipts to CSV`,
+                });
+              }}>
+                <FileText className="h-4 w-4 mr-2" />
+                Export CSV
+              </Button>
+            </div>
+          )}
+        </div>
+
         <div className="rounded-lg border bg-card shadow-custom">
           <Table>
             <TableHeader>
@@ -224,7 +391,7 @@ const ReceiptHistory = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {receipts?.map((receipt) => {
+              {filteredReceipts?.map((receipt) => {
                 const statusInfo = getStatusInfo(receipt.status);
                 return (
                   <TableRow
@@ -248,7 +415,7 @@ const ReceiptHistory = () => {
                       )}
                     </TableCell>
                     <TableCell className="font-medium">
-                      ₹{receipt.amount.toLocaleString('en-IN')}
+                      {formatRupees(receipt.amount)}
                     </TableCell>
                     <TableCell>
                       <span
@@ -260,15 +427,77 @@ const ReceiptHistory = () => {
                     </TableCell>
                     <TableCell>{formatDate(receipt.generatedAt)}</TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDownload(receipt.id)}
-                        className="inline-flex items-center gap-2 hover:bg-primary/10 transition-all"
-                      >
-                        <Download className="h-4 w-4" />
-                        {t("receipts.download", "Download")}
-                      </Button>
+                      <div className="flex gap-2 justify-end">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-1" />
+                              View
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-lg">
+                            <DialogHeader>
+                              <DialogTitle>Receipt Details #{receipt.id}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <h4 className="font-semibold text-sm">Equipment</h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    {receipt.metadata?.equipment_name || "N/A"}
+                                  </p>
+                                </div>
+                                <div>
+                                  <h4 className="font-semibold text-sm">Amount</h4>
+                                  <p className="text-lg font-bold text-green-600">
+                                    {formatRupees(receipt.amount)}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <h4 className="font-semibold text-sm">Booking Period</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {receipt.metadata?.booking_dates ? (
+                                    `${formatDate(receipt.metadata.booking_dates.start)} to ${formatDate(receipt.metadata.booking_dates.end)}`
+                                  ) : "N/A"}
+                                </p>
+                              </div>
+                              
+                              <div>
+                                <h4 className="font-semibold text-sm">Payment Method</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {receipt.metadata?.payment_method || "Online Payment"}
+                                </p>
+                              </div>
+                              
+                              <div>
+                                <h4 className="font-semibold text-sm">Status</h4>
+                                <Badge className={getStatusInfo(receipt.status).className}>
+                                  {getStatusInfo(receipt.status).text}
+                                </Badge>
+                              </div>
+                              
+                              <div>
+                                <h4 className="font-semibold text-sm">Generated On</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {formatDate(receipt.generatedAt)}
+                                </p>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownload(receipt.id)}
+                          className="hover:bg-primary/10"
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          PDF
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 );

@@ -4,6 +4,15 @@
 A comprehensive farm equipment rental platform built with React/TypeScript frontend and Express/Node.js backend. The platform enables farmers to rent agricultural equipment with features including equipment browsing, booking, payments, and AI-powered assistance.
 
 ## Recent Changes
+- **2025-06-28**: Enhanced receipt history system with comprehensive features
+  - Fixed receipt amount formatting with proper Indian Rupee display using Intl.NumberFormat
+  - Normalized database receipt amounts to store consistently in rupees
+  - Added analytics dashboard with total receipts, amounts, and status counts
+  - Implemented search functionality by equipment name or receipt ID
+  - Added status filtering (All, Paid, Pending) with real-time results count
+  - Created detailed receipt view modal with complete transaction information
+  - Added CSV export feature for filtered receipt data
+  - Enhanced UI with professional cards, better spacing, and responsive design
 - **2025-06-28**: Fixed receipt amount formatting and mobile view issues
   - Corrected amount display inconsistency between Razorpay and booking system
   - Fixed receipt amounts showing ₹200 instead of correct ₹2,000
