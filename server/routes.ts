@@ -186,7 +186,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Get coordinates from cityCoordinates map
-      const cityCoordinates = {
+      const cityCoordinates: Record<string, number[]> = {
         'pune': [18.5204, 73.8567],
         'mumbai': [19.0760, 72.8777],
         'delhi': [28.6139, 77.2090],
@@ -397,7 +397,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Always update coordinates when equipment is modified
-      const cityCoordinates = {
+      const cityCoordinates: Record<string, number[]> = {
         'pune': [18.5204, 73.8567],
         'mumbai': [19.0760, 72.8777],
         'delhi': [28.6139, 77.2090],
@@ -848,7 +848,7 @@ export function registerRoutes(app: Express): Server {
         ...receipt,
         amount: Number(receipt.amount), // Ensure amount is a number
         generatedAt: receipt.generatedAt.toISOString()
-      }))
+      })));
     } catch (error) {
       console.error('Error fetching receipts:', error);
       res.status(500).json({
@@ -1502,8 +1502,9 @@ export function registerRoutes(app: Express): Server {
       const review = await storage.createReview(parsed.data);
 
       // Update equipment popularity after review
+      const newPopularity = await storage.calculateEquipmentPopularity(parsed.data.equipmentId);
       await storage.updateEquipment(parsed.data.equipmentId, {
-        popularity: await storage.calculateEquipmentPopularity(parsed.data.equipmentId)
+        popularity: newPopularity
       });
 
       // Update booking to mark it as rated

@@ -22,7 +22,7 @@ export interface IStorage {
   listEquipmentByOwner(ownerId: number): Promise<Equipment[]>;
   createEquipment(equipment: InsertEquipment): Promise<Equipment>;
   deleteEquipment(id: number): Promise<void>;
-  updateEquipment(id: number, data: Partial<InsertEquipment>): Promise<Equipment>;
+  updateEquipment(id: number, data: Partial<InsertEquipment> & { popularity?: number }): Promise<Equipment>;
 
   // Booking operations
   getBooking(id: number): Promise<Booking | undefined>;
@@ -317,7 +317,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async updateEquipment(id: number, data: Partial<InsertEquipment>): Promise<Equipment> {
+  async updateEquipment(id: number, data: Partial<InsertEquipment> & { popularity?: number }): Promise<Equipment> {
     try {
       // Ensure JSON fields are properly handled
       const updateData = {

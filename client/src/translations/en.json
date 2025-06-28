@@ -48,6 +48,9 @@
     "password": "Password",
     "usernamePlaceholder": "Enter your username",
     "passwordPlaceholder": "Enter your password",
+    "resetPassword": "Reset Password",
+    "resetPasswordDesc": "Enter your email address to receive password reset instructions.",
+    "sendResetLink": "Send Reset Link",
     "confirmPasswordPlaceholder": "Re-enter your password",
     "namePlaceholder": "Enter your full name",
     "emailPlaceholder": "Enter your email address",
@@ -352,7 +355,12 @@
     "receiptHistory": "Receipt History",
     "compare": "Compare Equipment",
     "receipts": "Receipt History",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "menu": "Menu",
+    "equipment": "Equipment",
+    "bookings": "Bookings",
+    "logout": "Logout",
+    "categories": "Categories"
   },
   "comparison": {
     "title": "Compare Equipment",
@@ -367,7 +375,8 @@
     "tractors": "Tractors",
     "harvesters": "Harvesters",
     "seeders": "Seeders",
-    "sprayers": "Sprayers"
+    "sprayers": "Sprayers",
+    "irrigation": "Irrigation"
   },
   "receipts": {
     "title": "Receipt History",

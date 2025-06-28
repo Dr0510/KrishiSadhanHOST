@@ -30,6 +30,9 @@
     "password": "पासवर्ड",
     "usernamePlaceholder": "अपना उपयोगकर्ता नाम दर्ज करें",
     "passwordPlaceholder": "अपना पासवर्ड दर्ज करें",
+    "resetPassword": "पासवर्ड रीसेट करें",
+    "resetPasswordDesc": "पासवर्ड रीसेट निर्देश प्राप्त करने के लिए अपना ईमेल पता दर्ज करें।",
+    "sendResetLink": "रीसेट लिंक भेजें",
     "confirmPasswordPlaceholder": "पासवर्ड दोबारा दर्ज करें",
     "namePlaceholder": "अपना पूरा नाम दर्ज करें",
     "emailPlaceholder": "अपना ईमेल पता दर्ज करें",
@@ -108,7 +111,9 @@
     "bookings": "बुकिंग",
     "receipts": "रसीद इतिहास",
     "compare": "उपकरण तुलना करें",
-    "backToHome": "वापस मुख्यपृष्ठ पर जाएं"
+    "backToHome": "वापस मुख्यपृष्ठ पर जाएं",
+    "menu": "मेन्यू",
+    "logout": "लॉग आउट"
   },
   "branding": {
     "name": "कृषि साधन",

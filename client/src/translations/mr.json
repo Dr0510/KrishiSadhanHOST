@@ -18,6 +18,9 @@
     "password": "पासवर्ड",
     "usernamePlaceholder": "तुमचे वापरकर्तानाव प्रविष्ट करा",
     "passwordPlaceholder": "तुमचा पासवर्ड प्रविष्ट करा",
+    "resetPassword": "पासवर्ड रीसेट करा",
+    "resetPasswordDesc": "पासवर्ड रीसेट सूचना मिळवण्यासाठी तुमचा ईमेल पत्ता टाका.",
+    "sendResetLink": "रीसेट लिंक पाठवा",
     "confirmPasswordPlaceholder": "पासवर्ड पुन्हा प्रविष्ट करा",
     "namePlaceholder": "तुमचे पूर्ण नाव प्रविष्ट करा",
     "emailPlaceholder": "तुमचा ईमेल पत्ता प्रविष्ट करा",
@@ -113,7 +116,9 @@
     "bookings": "बुकिंग",
     "receipts": "पावती इतिहास",
     "compare": "उपकरणे तुलना करा",
-    "backToHome": "मुख्यपृष्ठावर परत जा"
+    "backToHome": "मुख्यपृष्ठावर परत जा",
+    "menu": "मेनू",
+    "logout": "लॉगआउट"
   },
   "comparison": {
     "title": "उपकरणे तुलना",
@@ -129,6 +134,7 @@
     "harvesters": "हार्वेस्टर",
     "seeders": "सीडर",
     "sprayers": "स्प्रेयर",
+    "irrigation": "सिंचन",
     "profile": "प्रोफाइल",
     "logout": "लॉगआउट",
     "admin": "प्रशासक",
