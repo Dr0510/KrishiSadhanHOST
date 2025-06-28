@@ -848,7 +848,7 @@ export function registerRoutes(app: Express): Server {
         ...receipt,
         amount: Number(receipt.amount), // Ensure amount is a number
         generatedAt: receipt.generatedAt.toISOString()
-      }));
+      }))
     } catch (error) {
       console.error('Error fetching receipts:', error);
       res.status(500).json({
