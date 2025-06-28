@@ -1349,12 +1349,6 @@ export function registerRoutes(app: Express): Server {
       doc.rect(logoX + 26, logoY + 8, 2, 4)
          .fill();
 
-      // KS initials in center
-      doc.fillColor('#ffffff')
-         .font('Helvetica-Bold')
-         .fontSize(8)
-         .text('KS', logoX + logoSize/2 - 6, logoY + logoSize/2 - 3);
-
       // Company Name and Details
       doc.font('Helvetica-Bold')
          .fontSize(28)
@@ -1440,10 +1434,11 @@ export function registerRoutes(app: Express): Server {
          .text(equipment.location, margin + 120, 285);
 
       doc.font('Helvetica-Bold')
+         .fontSize(11)
          .text('Daily Rate:', margin + 15, 300)
          .font('Helvetica')
          .fontSize(11)
-         .text(`₹${Math.floor(equipment.dailyRate / 100).toLocaleString('en-IN')}`, margin + 120, 300);
+         .text(formatAmount(equipment.dailyRate), margin + 120, 300);
 
       // Rental Period Section
       doc.fillColor('#2c3e50')
@@ -1501,19 +1496,22 @@ export function registerRoutes(app: Express): Server {
       const gstAmount = Math.round(baseAmount * (gstRate / 100));
       const totalAmount = baseAmount + gstAmount;
 
-      // Helper function to format currency consistently
+      // Helper function to format currency consistently with proper styling
       const formatAmount = (amount) => {
         return `₹${Math.floor(amount / 100).toLocaleString('en-IN')}`;
       };
 
       doc.font('Helvetica')
          .fontSize(10)
-         .text('Equipment Rental', margin + 10, 485)
+         .text('Equipment Rental', margin + 10, 485);
+      
+      doc.fontSize(10)
          .text(formatAmount(equipment.dailyRate), margin + 200, 485)
          .text(`${rentalDays}`, margin + 280, 485)
          .text(formatAmount(baseAmount), margin + 350, 485);
 
-      doc.text(`GST (${gstRate}%)`, margin + 10, 500)
+      doc.fontSize(10)
+         .text(`GST (${gstRate}%)`, margin + 10, 500)
          .text('-', margin + 200, 500)
          .text('-', margin + 280, 500)
          .text(formatAmount(gstAmount), margin + 350, 500);
@@ -1528,7 +1526,11 @@ export function registerRoutes(app: Express): Server {
       doc.font('Helvetica-Bold')
          .fontSize(14)
          .fillColor('#228B22')
-         .text('Total Amount Paid:', margin + 10, 530)
+         .text('Total Amount Paid:', margin + 10, 530);
+      
+      doc.font('Helvetica-Bold')
+         .fontSize(14)
+         .fillColor('#228B22')
          .text(formatAmount(receipt.amount), margin + 350, 530);
 
       // Payment Information
