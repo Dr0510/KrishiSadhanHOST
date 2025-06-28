@@ -22,9 +22,13 @@ export interface FilterParams {
   minPrice: number;
   maxPrice: number;
   location: string;
-  //radius?: number;
-  //season?: 'spring' | 'summer' | 'autumn' | 'winter';
+  radius?: number;
+  season?: 'spring' | 'summer' | 'autumn' | 'winter';
   specifications?: Record<string, any>;
+  availabilityOnly?: boolean;
+  sortBy?: 'price' | 'rating' | 'distance' | 'popularity';
+  fuelType?: 'diesel' | 'electric' | 'manual';
+  capacity?: string;
 }
 
 interface EquipmentFiltersProps {
@@ -54,6 +58,19 @@ const SEASONS = [
   { id: 'winter', label: 'Winter' }
 ] as const;
 
+const FUEL_TYPES = [
+  { id: 'diesel', label: 'Diesel' },
+  { id: 'electric', label: 'Electric' },
+  { id: 'manual', label: 'Manual' }
+] as const;
+
+const SORT_OPTIONS = [
+  { id: 'price', label: 'Price (Low to High)' },
+  { id: 'rating', label: 'Rating (High to Low)' },
+  { id: 'distance', label: 'Distance (Near to Far)' },
+  { id: 'popularity', label: 'Most Popular' }
+] as const;
+
 export function EquipmentFilters({ onFilterChange, maxPrice, isLoading = false }: EquipmentFiltersProps) {
   const { t } = useTranslation();
   const [filters, setFilters] = useState<FilterParams>(() => {
@@ -64,9 +81,13 @@ export function EquipmentFilters({ onFilterChange, maxPrice, isLoading = false }
       minPrice: 0,
       maxPrice: Number.MAX_SAFE_INTEGER,
       location: "",
-      //radius: 50,
-      //season: undefined,
-      specifications: {}
+      radius: 50,
+      season: undefined,
+      specifications: {},
+      availabilityOnly: false,
+      sortBy: 'price',
+      fuelType: undefined,
+      capacity: ""
     };
   });
 

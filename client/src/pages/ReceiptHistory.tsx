@@ -373,9 +373,9 @@ const ReceiptHistory = () => {
                                   </p>
                                 </div>
                                 <div>
-                                  <h4 className="font-semibold text-sm">Amount</h4>
-                                  <p className="text-lg font-bold text-green-600">
-                                    {formatRupees(receipt.amount)}
+                                  <h4 className="font-semibold text-sm">Payment Status</h4>
+                                  <p className="text-sm font-medium text-green-600">
+                                    Payment Confirmed
                                   </p>
                                 </div>
                               </div>
@@ -387,6 +387,46 @@ const ReceiptHistory = () => {
                                     `${formatDate(receipt.metadata.booking_dates.start)} to ${formatDate(receipt.metadata.booking_dates.end)}`
                                   ) : "N/A"}
                                 </p>
+                              </div>
+                              
+                              <div className="border-t pt-4">
+                                <h4 className="font-semibold text-sm mb-2">Rental Calculation</h4>
+                                <div className="space-y-2 text-sm">
+                                  {(() => {
+                                    if (receipt.metadata?.booking_dates) {
+                                      const startDate = new Date(receipt.metadata.booking_dates.start);
+                                      const endDate = new Date(receipt.metadata.booking_dates.end);
+                                      const daysRented = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                                      const dailyRate = Math.round(receipt.amount / daysRented);
+                                      return (
+                                        <>
+                                          <div className="flex justify-between">
+                                            <span>Daily Rate:</span>
+                                            <span>{formatRupees(dailyRate)}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span>Rental Period:</span>
+                                            <span>{daysRented} day(s)</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span>Equipment Rental:</span>
+                                            <span>{formatRupees(dailyRate)} × {daysRented} = {formatRupees(receipt.amount)}</span>
+                                          </div>
+                                          <div className="flex justify-between font-bold border-t pt-2">
+                                            <span>Total Amount Paid:</span>
+                                            <span className="text-green-600">{formatRupees(receipt.amount)}</span>
+                                          </div>
+                                        </>
+                                      );
+                                    }
+                                    return (
+                                      <div className="flex justify-between font-bold">
+                                        <span>Total Amount Paid:</span>
+                                        <span className="text-green-600">{formatRupees(receipt.amount)}</span>
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
                               </div>
                               
                               <div>

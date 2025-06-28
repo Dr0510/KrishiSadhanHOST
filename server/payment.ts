@@ -166,11 +166,21 @@ export async function generateReceipt(bookingId: number, paymentId: string) {
     doc.text("Payment Summary", 20, currentY);
     currentY += lineHeight * 1.5;
 
-    // Convert amount from paise to rupees for display
-    const amountInRupees = payment.amount / 100;
+    // Calculate rental details
+    const startDate = new Date(booking.startDate);
+    const endDate = new Date(booking.endDate);
+    const daysRented = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const dailyRate = equipment.dailyRate;
+    const totalCalculated = dailyRate * daysRented;
 
     doc.setFont("helvetica", "normal");
-    doc.text(`Amount Paid: ₹${amountInRupees.toLocaleString('hi-IN')}`, 20, currentY);
+    doc.text(`Daily Rate: ₹${dailyRate.toLocaleString('en-IN')}`, 20, currentY);
+    currentY += lineHeight;
+    doc.text(`Rental Period: ${daysRented} day(s)`, 20, currentY);
+    currentY += lineHeight;
+    doc.text(`Equipment Rental: ₹${dailyRate.toLocaleString('en-IN')} × ${daysRented} = ₹${totalCalculated.toLocaleString('en-IN')}`, 20, currentY);
+    currentY += lineHeight;
+    doc.text(`Total Amount Paid: ₹${booking.totalPrice.toLocaleString('en-IN')}`, 20, currentY);
     doc.text(`Status: ${payment.status.toUpperCase()}`, pageWidth - 60, currentY);
     currentY += lineHeight * 2;
 

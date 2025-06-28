@@ -38,7 +38,7 @@ export function Chatbot() {
 
   // WhatsApp integration function
   const sendToWhatsApp = (message: string) => {
-    const phoneNumber = "919876543210"; // Replace with actual support number
+    const phoneNumber = "917385688905"; // Updated support number
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };

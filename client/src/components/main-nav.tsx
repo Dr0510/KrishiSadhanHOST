@@ -380,13 +380,13 @@ export function MainNav() {
               variant="ghost"
               size="icon"
               onClick={() => {
-                const phoneNumber = "919876543210";
+                const phoneNumber = "917385688905";
                 const message = "Hello! I need help with farm equipment rental. Can you assist me?";
                 const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
                 window.open(whatsappUrl, '_blank');
               }}
               aria-label="Contact us on WhatsApp"
-              title="Contact Support"
+              title="Contact Support - 7385688905"
             >
               <Phone className="h-5 w-5" />
             </Button>
