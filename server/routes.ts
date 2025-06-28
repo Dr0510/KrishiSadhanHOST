@@ -1442,7 +1442,8 @@ export function registerRoutes(app: Express): Server {
       doc.font('Helvetica-Bold')
          .text('Daily Rate:', margin + 15, 300)
          .font('Helvetica')
-         .text(`₹${(equipment.dailyRate / 100).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, margin + 120, 300);
+         .fontSize(11)
+         .text(`₹${Math.floor(equipment.dailyRate / 100).toLocaleString('en-IN')}`, margin + 120, 300);
 
       // Rental Period Section
       doc.fillColor('#2c3e50')
@@ -1500,17 +1501,22 @@ export function registerRoutes(app: Express): Server {
       const gstAmount = Math.round(baseAmount * (gstRate / 100));
       const totalAmount = baseAmount + gstAmount;
 
+      // Helper function to format currency consistently
+      const formatAmount = (amount) => {
+        return `₹${Math.floor(amount / 100).toLocaleString('en-IN')}`;
+      };
+
       doc.font('Helvetica')
-         .fontSize(9)
+         .fontSize(10)
          .text('Equipment Rental', margin + 10, 485)
-         .text(`₹${(equipment.dailyRate / 100).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, margin + 200, 485)
+         .text(formatAmount(equipment.dailyRate), margin + 200, 485)
          .text(`${rentalDays}`, margin + 280, 485)
-         .text(`₹${(baseAmount / 100).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, margin + 350, 485);
+         .text(formatAmount(baseAmount), margin + 350, 485);
 
       doc.text(`GST (${gstRate}%)`, margin + 10, 500)
          .text('-', margin + 200, 500)
          .text('-', margin + 280, 500)
-         .text(`₹${(gstAmount / 100).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, margin + 350, 500);
+         .text(formatAmount(gstAmount), margin + 350, 500);
 
       // Total line
       doc.moveTo(margin + 10, 520)
@@ -1522,15 +1528,8 @@ export function registerRoutes(app: Express): Server {
       doc.font('Helvetica-Bold')
          .fontSize(14)
          .fillColor('#228B22')
-         .text('Total Amount Paid:', margin + 10, 530);
-      
-      // Format amount properly
-      const formattedAmount = `₹${(receipt.amount / 100).toLocaleString('en-IN', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      })}`;
-      
-      doc.text(formattedAmount, margin + 350, 530);
+         .text('Total Amount Paid:', margin + 10, 530)
+         .text(formatAmount(receipt.amount), margin + 350, 530);
 
       // Payment Information
       doc.fillColor('#495057')
