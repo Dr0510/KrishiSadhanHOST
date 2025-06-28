@@ -1468,6 +1468,11 @@ export function registerRoutes(app: Express): Server {
          .font('Helvetica')
          .text(`${rentalDays} day(s)`, margin + 120, 405);
 
+      // Helper function to format currency consistently with proper styling
+      const formatAmount = (amount) => {
+        return `₹${Math.floor(amount / 100).toLocaleString('en-IN')}`;
+      };
+
       // Payment Summary Section
       doc.fillColor('#2c3e50')
          .font('Helvetica-Bold')
@@ -1495,11 +1500,6 @@ export function registerRoutes(app: Express): Server {
       const gstRate = 18;
       const gstAmount = Math.round(baseAmount * (gstRate / 100));
       const totalAmount = baseAmount + gstAmount;
-
-      // Helper function to format currency consistently with proper styling
-      const formatAmount = (amount) => {
-        return `₹${Math.floor(amount / 100).toLocaleString('en-IN')}`;
-      };
 
       doc.font('Helvetica')
          .fontSize(10)
