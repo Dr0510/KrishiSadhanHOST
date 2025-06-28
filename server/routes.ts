@@ -1412,59 +1412,59 @@ export function registerRoutes(app: Express): Server {
       // Cost Breakdown Section
       doc.font('Helvetica-Bold')
          .fontSize(14)
-         .text('Cost Breakdown', margin, 620);
+         .text('Cost Breakdown', margin, 670);
 
-      // Create a table for cost breakdown
-      const tableTop = 640;
-      doc.rect(margin, tableTop, contentWidth, 100)
-         .fillAndStroke('#ffffff', '#e2e8f0');
+      const baseAmount = equipment.dailyRate * rentalDays;
+      const taxAmount = Math.round(baseAmount * 0.18); // 18% GST
+      const totalAmount = baseAmount + taxAmount;
 
-      // Table headers
-      doc.rect(margin, tableTop, contentWidth, 25)
-         .fillAndStroke('#f1f5f9', '#cbd5e1');
+      doc.rect(margin, 695, contentWidth, 130)
+         .fillAndStroke('#f5f5f5', '#cccccc');
 
-      doc.fillColor('#374151')
-         .font('Helvetica-Bold')
-         .fontSize(10)
-         .text('Description', margin + 10, tableTop + 8)
-         .text('Days', margin + 250, tableTop + 8, { align: 'center', width: 60 })
-         .text('Rate/Day', margin + 350, tableTop + 8, { align: 'center', width: 80 })
-         .text('Amount', margin + 450, tableTop + 8, { align: 'right', width: 80 });
+      // Cost details with better alignment
+      doc.fillColor('#333333')
+         .font('Helvetica')
+         .fontSize(12)
+         .text(`Base Amount (₹${(equipment.dailyRate / 100).toLocaleString('en-IN')} × ${rentalDays} days):`, margin + 20, 715)
+         .text(`₹${(baseAmount / 100).toLocaleString('en-IN')}`, pageWidth - 140, 715)
+         .text('GST (18%):', margin + 20, 740)
+         .text(`₹${(taxAmount / 100).toLocaleString('en-IN')}`, pageWidth - 140, 740);
 
-      // Table content
+      // Total line with better styling
+      doc.moveTo(margin + 20, 765)
+         .lineTo(pageWidth - margin - 20, 765)
+         .lineWidth(2)
+         .stroke('#2d7d32');
+
+      doc.font('Helvetica-Bold')
+         .fontSize(16)
+         .fillColor('#2d7d32')
+         .text('Total Amount:', margin + 20, 780)
+         .text(`₹${(totalAmount / 100).toLocaleString('en-IN')}`, pageWidth - 140, 780);
+
+      // Paid amount (from receipt)
+      doc.font('Helvetica-Bold')
+         .fontSize(14)
+         .fillColor('#4caf50')
+         .text('Amount Paid:', margin + 20, 805)
+         .text(`₹${(receipt.amount / 100).toLocaleString('en-IN')}`, pageWidth - 140, 805);
+
+      // Professional footer
+      doc.rect(0, pageWidth - 60, pageWidth, 60)
+         .fillAndStroke('#2d7d32', '#2d7d32');
+
       doc.font('Helvetica')
          .fontSize(10)
-         .text(`${equipment.name} Rental`, margin + 10, tableTop + 35)
-         .text(`${rentalDays}`, margin + 250, tableTop + 35, { align: 'center', width: 60 })
-         .text(`₹${(equipment.dailyRate / 100).toLocaleString('en-IN')}`, margin + 350, tableTop + 35, { align: 'center', width: 80 })
-         .text(`₹${(receipt.amount / 100).toLocaleString('en-IN')}`, margin + 450, tableTop + 35, { align: 'right', width: 80 });
+         .fillColor('#ffffff')
+         .text('Thank you for choosing KrishiSadhan - Your trusted partner in agricultural equipment rental', margin, pageWidth - 40, { 
+           align: 'center', 
+           width: contentWidth 
+         })
+         .text('For support: support@krishisadhan.shop | +91-7385688905', margin, pageWidth - 25, { 
+           align: 'center', 
+           width: contentWidth 
+         });
 
-      // Total amount section
-      doc.rect(margin, tableTop + 65, contentWidth, 35)
-         .fillAndStroke('#1e40af', '#1e40af');
-
-      doc.fillColor('#ffffff')
-         .font('Helvetica-Bold')
-         .fontSize(14)
-         .text('Total Amount Paid:', margin + 10, tableTop + 78)
-         .text(`₹${(receipt.amount / 100).toLocaleString('en-IN')}`, margin + 450, tableTop + 78, { align: 'right', width: 80 });
-
-      // Footer section
-      const footerTop = 780;
-      doc.rect(0, footerTop, pageWidth, 62)
-         .fillAndStroke('#f8fafc', '#e2e8f0');
-
-      doc.fillColor('#6b7280')
-         .font('Helvetica')
-         .fontSize(9)
-         .text('Thank you for choosing AgriEquip Rentals!', margin, footerTop + 15)
-         .text('This is a computer-generated receipt and does not require a signature.', margin, footerTop + 30)
-         .text(`Generated on ${format(new Date(), 'dd MMM yyyy, hh:mm a')}`, margin, footerTop + 45);
-
-      doc.text('For support: support@agriculturequipment.com | +91-9876543210', pageWidth - 300, footerTop + 15, { align: 'right', width: 260 })
-         .text('Terms & Conditions apply. Visit our website for details.', pageWidth - 300, footerTop + 30, { align: 'right', width: 260 });
-
-      // Finalize the PDF
       doc.end();
     } catch (error) {
       console.error('Error generating receipt PDF:', error);
