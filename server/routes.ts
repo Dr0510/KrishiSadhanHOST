@@ -1307,162 +1307,161 @@ export function registerRoutes(app: Express): Server {
 
       // Professional PDF Content Generation
       const pageWidth = 595.28; // A4 width in points
-      const pageHeight = 841.89; // A4 height in points
-      const margin = 50;
+      const margin = 40;
       const contentWidth = pageWidth - (margin * 2);
 
       // Professional Header with KrishiSadhan branding
-      doc.rect(0, 0, pageWidth, 100)
+      doc.rect(0, 0, pageWidth, 80)
          .fillAndStroke('#228B22', '#228B22'); // Forest Green
 
-      // Company Logo Area (placeholder)
-      doc.rect(margin, 15, 60, 60)
+      // Company Logo with proper branding
+      doc.circle(margin + 30, 40, 25)
          .fillAndStroke('#ffffff', '#ffffff');
       
+      // Brand logo text
       doc.fillColor('#228B22')
          .font('Helvetica-Bold')
-         .fontSize(16)
-         .text('🌾', margin + 22, 35);
+         .fontSize(20)
+         .text('🌾', margin + 20, 30);
 
       // Company Name and Details
       doc.font('Helvetica-Bold')
-         .fontSize(32)
+         .fontSize(28)
          .fillColor('#ffffff')
-         .text('KrishiSadhan', margin + 80, 20);
+         .text('KrishiSadhan', margin + 70, 25);
 
       doc.font('Helvetica')
-         .fontSize(12)
+         .fontSize(11)
          .fillColor('#ffffff')
-         .text('Premium Agricultural Equipment Rental Platform', margin + 80, 55)
-         .text('Empowering Modern Farming Solutions', margin + 80, 72);
+         .text('Premium Agricultural Equipment Rental Platform', margin + 70, 50);
 
       // Company contact details on right
-      doc.fontSize(10)
+      doc.fontSize(9)
          .fillColor('#ffffff')
-         .text('www.krishisadhan.shop', pageWidth - 200, 25)
-         .text('support@krishisadhan.shop', pageWidth - 200, 40)
-         .text('+91-7385688905', pageWidth - 200, 55)
-         .text('All over Maharashtra, India', pageWidth - 200, 70);
+         .text('www.krishisadhan.shop', pageWidth - 160, 20)
+         .text('support@krishisadhan.shop', pageWidth - 160, 32)
+         .text('+91-7385688905', pageWidth - 160, 44)
+         .text('Maharashtra, India', pageWidth - 160, 56);
 
       // Receipt Title with elegant styling
       doc.fillColor('#2c3e50')
          .font('Helvetica-Bold')
-         .fontSize(24)
-         .text('RENTAL RECEIPT', margin, 130);
+         .fontSize(20)
+         .text('RENTAL RECEIPT', margin, 100);
 
       // Horizontal line under title
-      doc.moveTo(margin, 155)
-         .lineTo(pageWidth - margin, 155)
+      doc.moveTo(margin, 125)
+         .lineTo(pageWidth - margin, 125)
          .lineWidth(2)
          .stroke('#228B22');
 
       // Receipt Information Section
-      doc.rect(margin, 170, contentWidth, 70)
+      doc.rect(margin, 140, contentWidth, 60)
          .fillAndStroke('#f8f9fa', '#e9ecef');
 
       // Receipt details
       doc.fillColor('#495057')
          .font('Helvetica-Bold')
-         .fontSize(12)
-         .text(`Receipt Number: #KS-${receipt.id.toString().padStart(6, '0')}`, margin + 20, 190)
-         .text(`Booking Reference: #BK-${receipt.bookingId.toString().padStart(6, '0')}`, margin + 20, 210);
+         .fontSize(11)
+         .text(`Receipt No: #KS-${receipt.id.toString().padStart(6, '0')}`, margin + 15, 155)
+         .text(`Booking Ref: #BK-${receipt.bookingId.toString().padStart(6, '0')}`, margin + 15, 170);
 
       doc.font('Helvetica')
-         .fontSize(11)
-         .text(`Issue Date: ${format(receipt.generatedAt, 'dd MMMM yyyy')}`, margin + 20, 225);
+         .fontSize(10)
+         .text(`Issue Date: ${format(receipt.generatedAt, 'dd MMMM yyyy')}`, margin + 15, 185);
 
-      // Status badge with better positioning
+      // Status badge
       const statusColor = receipt.status === 'paid' ? '#28a745' : '#ffc107';
       const statusText = receipt.status === 'paid' ? 'PAYMENT CONFIRMED' : 'PENDING';
 
-      doc.rect(pageWidth - 180, 185, 130, 30)
+      doc.rect(pageWidth - 160, 150, 120, 25)
          .fillAndStroke(statusColor, statusColor);
 
       doc.fillColor('#ffffff')
          .font('Helvetica-Bold')
-         .fontSize(11)
-         .text(statusText, pageWidth - 175, 195, { align: 'center', width: 120 });
+         .fontSize(10)
+         .text(statusText, pageWidth - 155, 160, { align: 'center', width: 110 });
 
       // Equipment Information Section
       doc.fillColor('#2c3e50')
          .font('Helvetica-Bold')
-         .fontSize(16)
-         .text('Equipment Details', margin, 270);
+         .fontSize(14)
+         .text('Equipment Details', margin, 220);
 
-      doc.rect(margin, 295, contentWidth, 100)
+      doc.rect(margin, 240, contentWidth, 80)
          .fillAndStroke('#ffffff', '#dee2e6');
-
-      doc.fillColor('#495057')
-         .font('Helvetica-Bold')
-         .fontSize(13)
-         .text('Equipment Name:', margin + 20, 315)
-         .font('Helvetica')
-         .text(equipment.name, margin + 150, 315);
-
-      doc.font('Helvetica-Bold')
-         .text('Category:', margin + 20, 335)
-         .font('Helvetica')
-         .text(equipment.category.charAt(0).toUpperCase() + equipment.category.slice(1), margin + 150, 335);
-
-      doc.font('Helvetica-Bold')
-         .text('Location:', margin + 20, 355)
-         .font('Helvetica')
-         .text(equipment.location, margin + 150, 355);
-
-      doc.font('Helvetica-Bold')
-         .text('Daily Rate:', margin + 20, 375)
-         .font('Helvetica')
-         .text(`₹${(equipment.dailyRate / 100).toLocaleString('en-IN')}`, margin + 150, 375);
-
-      // Rental Period Section
-      doc.fillColor('#2c3e50')
-         .font('Helvetica-Bold')
-         .fontSize(16)
-         .text('Rental Period', margin, 425);
-
-      const rentalDays = Math.max(1, Math.ceil((new Date(booking.endDate).getTime() - new Date(booking.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1);
-
-      doc.rect(margin, 450, contentWidth, 80)
-         .fillAndStroke('#e8f5e8', '#c3e6c3');
-
-      doc.fillColor('#495057')
-         .font('Helvetica-Bold')
-         .fontSize(12)
-         .text('Start Date:', margin + 20, 470)
-         .font('Helvetica')
-         .text(format(booking.startDate, 'dd MMMM yyyy'), margin + 150, 470);
-
-      doc.font('Helvetica-Bold')
-         .text('End Date:', margin + 20, 490)
-         .font('Helvetica')
-         .text(format(booking.endDate, 'dd MMMM yyyy'), margin + 150, 490);
-
-      doc.font('Helvetica-Bold')
-         .text('Total Days:', margin + 20, 510)
-         .font('Helvetica')
-         .text(`${rentalDays} day(s)`, margin + 150, 510);
-
-      // Payment Summary Section
-      doc.fillColor('#2c3e50')
-         .font('Helvetica-Bold')
-         .fontSize(16)
-         .text('Payment Summary', margin, 560);
-
-      // Create professional payment table
-      doc.rect(margin, 585, contentWidth, 120)
-         .fillAndStroke('#ffffff', '#dee2e6');
-
-      // Table header
-      doc.rect(margin, 585, contentWidth, 25)
-         .fillAndStroke('#f8f9fa', '#dee2e6');
 
       doc.fillColor('#495057')
          .font('Helvetica-Bold')
          .fontSize(11)
-         .text('Description', margin + 15, 595)
-         .text('Rate', margin + 250, 595)
-         .text('Days', margin + 350, 595)
-         .text('Amount', margin + 420, 595);
+         .text('Equipment:', margin + 15, 255)
+         .font('Helvetica')
+         .text(equipment.name, margin + 120, 255);
+
+      doc.font('Helvetica-Bold')
+         .text('Category:', margin + 15, 270)
+         .font('Helvetica')
+         .text(equipment.category.charAt(0).toUpperCase() + equipment.category.slice(1), margin + 120, 270);
+
+      doc.font('Helvetica-Bold')
+         .text('Location:', margin + 15, 285)
+         .font('Helvetica')
+         .text(equipment.location, margin + 120, 285);
+
+      doc.font('Helvetica-Bold')
+         .text('Daily Rate:', margin + 15, 300)
+         .font('Helvetica')
+         .text(`₹${(equipment.dailyRate / 100).toLocaleString('en-IN')}`, margin + 120, 300);
+
+      // Rental Period Section
+      doc.fillColor('#2c3e50')
+         .font('Helvetica-Bold')
+         .fontSize(14)
+         .text('Rental Period', margin, 340);
+
+      const rentalDays = Math.max(1, Math.ceil((new Date(booking.endDate).getTime() - new Date(booking.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1);
+
+      doc.rect(margin, 360, contentWidth, 60)
+         .fillAndStroke('#e8f5e8', '#c3e6c3');
+
+      doc.fillColor('#495057')
+         .font('Helvetica-Bold')
+         .fontSize(11)
+         .text('Start Date:', margin + 15, 375)
+         .font('Helvetica')
+         .text(format(booking.startDate, 'dd MMMM yyyy'), margin + 120, 375);
+
+      doc.font('Helvetica-Bold')
+         .text('End Date:', margin + 15, 390)
+         .font('Helvetica')
+         .text(format(booking.endDate, 'dd MMMM yyyy'), margin + 120, 390);
+
+      doc.font('Helvetica-Bold')
+         .text('Total Days:', margin + 15, 405)
+         .font('Helvetica')
+         .text(`${rentalDays} day(s)`, margin + 120, 405);
+
+      // Payment Summary Section
+      doc.fillColor('#2c3e50')
+         .font('Helvetica-Bold')
+         .fontSize(14)
+         .text('Payment Summary', margin, 440);
+
+      // Create professional payment table
+      doc.rect(margin, 460, contentWidth, 100)
+         .fillAndStroke('#ffffff', '#dee2e6');
+
+      // Table header
+      doc.rect(margin, 460, contentWidth, 20)
+         .fillAndStroke('#f8f9fa', '#dee2e6');
+
+      doc.fillColor('#495057')
+         .font('Helvetica-Bold')
+         .fontSize(10)
+         .text('Description', margin + 10, 468)
+         .text('Rate', margin + 200, 468)
+         .text('Days', margin + 280, 468)
+         .text('Amount', margin + 350, 468);
 
       // Table content
       const baseAmount = equipment.dailyRate * rentalDays;
@@ -1471,60 +1470,57 @@ export function registerRoutes(app: Express): Server {
       const totalAmount = baseAmount + gstAmount;
 
       doc.font('Helvetica')
-         .fontSize(10)
-         .text('Equipment Rental', margin + 15, 620)
-         .text(`₹${(equipment.dailyRate / 100).toLocaleString('en-IN')}`, margin + 250, 620)
-         .text(`${rentalDays}`, margin + 350, 620)
-         .text(`₹${(baseAmount / 100).toLocaleString('en-IN')}`, margin + 420, 620);
+         .fontSize(9)
+         .text('Equipment Rental', margin + 10, 485)
+         .text(`₹${(equipment.dailyRate / 100).toLocaleString('en-IN')}`, margin + 200, 485)
+         .text(`${rentalDays}`, margin + 280, 485)
+         .text(`₹${(baseAmount / 100).toLocaleString('en-IN')}`, margin + 350, 485);
 
-      doc.text(`GST (${gstRate}%)`, margin + 15, 640)
-         .text('-', margin + 250, 640)
-         .text('-', margin + 350, 640)
-         .text(`₹${(gstAmount / 100).toLocaleString('en-IN')}`, margin + 420, 640);
+      doc.text(`GST (${gstRate}%)`, margin + 10, 500)
+         .text('-', margin + 200, 500)
+         .text('-', margin + 280, 500)
+         .text(`₹${(gstAmount / 100).toLocaleString('en-IN')}`, margin + 350, 500);
 
       // Total line
-      doc.moveTo(margin + 15, 665)
-         .lineTo(pageWidth - margin - 15, 665)
+      doc.moveTo(margin + 10, 520)
+         .lineTo(pageWidth - margin - 10, 520)
          .lineWidth(1)
          .stroke('#dee2e6');
 
+      // Fixed amount display with consistent formatting
       doc.font('Helvetica-Bold')
          .fontSize(14)
          .fillColor('#228B22')
-         .text('Total Amount:', margin + 15, 675)
-         .text(`₹${(totalAmount / 100).toLocaleString('en-IN')}`, margin + 420, 675);
+         .text('Total Amount Paid:', margin + 10, 530)
+         .text(`₹${(receipt.amount / 100).toLocaleString('en-IN')}`, margin + 350, 530);
 
       // Payment Information
       doc.fillColor('#495057')
          .font('Helvetica')
-         .fontSize(10)
-         .text(`Payment ID: ${receipt.razorpayPaymentId}`, margin, 720)
-         .text(`Payment Method: ${receipt.metadata.payment_method || 'Online Payment'}`, margin, 735)
-         .text(`Transaction Date: ${format(receipt.generatedAt, 'dd MMM yyyy, hh:mm a')}`, margin, 750);
+         .fontSize(9)
+         .text(`Payment ID: ${receipt.razorpayPaymentId}`, margin, 570)
+         .text(`Payment Method: ${receipt.metadata.payment_method || 'Online Payment'}`, margin, 582)
+         .text(`Transaction Date: ${format(receipt.generatedAt, 'dd MMM yyyy, hh:mm a')}`, margin, 594);
 
       // Professional Footer
-      doc.rect(0, pageHeight - 80, pageWidth, 80)
+      doc.rect(0, 620, pageWidth, 60)
          .fillAndStroke('#2c3e50', '#2c3e50');
 
       doc.font('Helvetica-Bold')
-         .fontSize(12)
+         .fontSize(11)
          .fillColor('#ffffff')
-         .text('Thank you for choosing KrishiSadhan!', margin, pageHeight - 60, { 
+         .text('Thank you for choosing KrishiSadhan!', margin, 635, { 
            align: 'center', 
            width: contentWidth 
          });
 
       doc.font('Helvetica')
-         .fontSize(10)
-         .text('Your trusted partner in agricultural equipment rental services', margin, pageHeight - 45, { 
+         .fontSize(9)
+         .text('Your trusted partner in agricultural equipment rental services', margin, 650, { 
            align: 'center', 
            width: contentWidth 
          })
-         .text('For support: support@krishisadhan.shop | +91-7385688905 | www.krishisadhan.shop', margin, pageHeight - 30, { 
-           align: 'center', 
-           width: contentWidth 
-         })
-         .text('This is a computer-generated receipt and does not require a physical signature.', margin, pageHeight - 15, { 
+         .text('For support: support@krishisadhan.shop | +91-7385688905 | www.krishisadhan.shop', margin, 662, { 
            align: 'center', 
            width: contentWidth 
          });
