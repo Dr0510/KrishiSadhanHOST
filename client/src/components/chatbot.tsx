@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, Send, X, Loader2, MinimizeIcon, Lightbulb } from "lucide-react";
+import { MessageCircle, Send, X, Loader2, MinimizeIcon, Lightbulb, Phone, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface Message {
@@ -31,8 +31,44 @@ export function Chatbot() {
     t('chatbot.suggestions.findEquipment', 'Find equipment for my farm'),
     t('chatbot.suggestions.bookingProcess', 'How do I book equipment?'),
     t('chatbot.suggestions.pricing', 'What are the rental prices?'),
-    t('chatbot.suggestions.availability', 'Check equipment availability')
+    t('chatbot.suggestions.availability', 'Check equipment availability'),
+    'Contact via WhatsApp',
+    'Share equipment list'
   ];
+
+  // WhatsApp integration function
+  const sendToWhatsApp = (message: string) => {
+    const phoneNumber = "919876543210"; // Replace with actual support number
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  // Share equipment information
+  const shareEquipmentInfo = async (addMessageFn: (content: string, sender: 'user' | 'bot') => void) => {
+    try {
+      const response = await fetch('/api/equipment');
+      const equipment = await response.json();
+      const topEquipment = equipment.slice(0, 5);
+      
+      const shareText = `🚜 Farm Equipment Available for Rent:\n\n${topEquipment.map((eq: any) => 
+        `• ${eq.name} - ₹${eq.pricePerDay}/day`
+      ).join('\n')}\n\nBook now: ${window.location.origin}`;
+      
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Farm Equipment Rental',
+          text: shareText,
+        });
+        addMessageFn('Equipment list shared successfully!', 'bot');
+      } else {
+        navigator.clipboard.writeText(shareText);
+        addMessageFn('Equipment list copied to clipboard! You can now paste it anywhere to share.', 'bot');
+      }
+    } catch (error) {
+      console.error('Share error:', error);
+      addMessageFn('Sorry, there was an error sharing the equipment list. Please try again.', 'bot');
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -65,6 +101,15 @@ export function Chatbot() {
     }
   };
 
+  const addMessage = (content: string, sender: 'user' | 'bot') => {
+    const message: Message = {
+      content,
+      sender,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, message]);
+  };
+
   const handleSubmit = async (e?: React.FormEvent, customMessage?: string) => {
     e?.preventDefault();
     const messageToSend = customMessage || input;
@@ -73,25 +118,33 @@ export function Chatbot() {
     // Hide suggestions after first interaction
     setShowSuggestions(false);
 
+    // Handle special commands
+    if (messageToSend.toLowerCase().includes('whatsapp') || messageToSend === 'Contact via WhatsApp') {
+      addMessage(messageToSend, 'user');
+      setInput("");
+      
+      const whatsappMessage = "Hello! I need help with farm equipment rental. Can you assist me?";
+      sendToWhatsApp(whatsappMessage);
+      addMessage("I've opened WhatsApp for you to contact our support team directly. You can send them your questions about equipment rental!", 'bot');
+      return;
+    }
+
+    if (messageToSend === 'Share equipment list') {
+      addMessage(messageToSend, 'user');
+      setInput("");
+      await shareEquipmentInfo(addMessage);
+      return;
+    }
+
     // Add user message
-    const userMessage: Message = {
-      content: messageToSend,
-      sender: 'user',
-      timestamp: new Date()
-    };
-    setMessages(prev => [...prev, userMessage]);
+    addMessage(messageToSend, 'user');
     setInput("");
     setIsTyping(true);
 
     try {
       // Get response from Gemini
       const response = await fetchGeminiResponse(messageToSend);
-      const botResponse: Message = {
-        content: response,
-        sender: 'bot',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botResponse]);
+      addMessage(response, 'bot');
     } catch (error) {
       console.error('Chat error:', error);
       // Add error message to chat

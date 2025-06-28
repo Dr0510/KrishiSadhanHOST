@@ -39,12 +39,9 @@ const ReceiptHistory = () => {
 
   // Format amount in Indian Rupees with proper formatting
   const formatRupees = (amount: number): string => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(amount);
+    // Ensure amount is a valid number
+    const numAmount = Number(amount) || 0;
+    return `₹${numAmount.toLocaleString('en-IN')}`;
   };
 
   const {
@@ -65,20 +62,8 @@ const ReceiptHistory = () => {
     },
   });
 
-  // Filter and search receipts
-  const filteredReceipts = useMemo(() => {
-    if (!receipts) return [];
-    
-    return receipts.filter((receipt) => {
-      const matchesSearch = searchTerm === "" || 
-        receipt.metadata?.equipment_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        receipt.id.toString().includes(searchTerm);
-      
-      const matchesStatus = statusFilter === "all" || receipt.status === statusFilter;
-      
-      return matchesSearch && matchesStatus;
-    });
-  }, [receipts, searchTerm, statusFilter]);
+  // Use all receipts since search is removed
+  const filteredReceipts = receipts || [];
 
   // Calculate analytics
   const analytics = useMemo(() => {
@@ -98,18 +83,18 @@ const ReceiptHistory = () => {
       { text: string; className: string; icon?: JSX.Element }
     > = {
       paid: {
-        text: t("receipts.status.paid", "Paid"),
-        className: "bg-green-100 text-green-800 border border-green-200",
+        text: "Payment Confirmed",
+        className: "bg-green-50 text-green-700 border border-green-200 font-medium px-3 py-1.5 rounded-full",
         icon: <span className="text-green-600 mr-1">✓</span>,
       },
       pending: {
-        text: t("receipts.status.pending", "Pending"),
-        className: "bg-yellow-100 text-yellow-800 border border-yellow-200",
+        text: "Processing",
+        className: "bg-yellow-50 text-yellow-700 border border-yellow-200 font-medium px-3 py-1.5 rounded-full",
         icon: <span className="text-yellow-600 mr-1">⏳</span>,
       },
       failed: {
-        text: t("receipts.status.failed", "Failed"),
-        className: "bg-red-100 text-red-800 border border-red-200",
+        text: "Payment Failed",
+        className: "bg-red-50 text-red-700 border border-red-200 font-medium px-3 py-1.5 rounded-full",
         icon: <span className="text-red-600 mr-1">✗</span>,
       },
     };
@@ -282,31 +267,7 @@ const ReceiptHistory = () => {
           </Card>
         </div>
 
-        {/* Search and Filter */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search by equipment name or receipt ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="border rounded-md px-3 py-2 bg-background"
-            >
-              <option value="all">All Status</option>
-              <option value="paid">Paid</option>
-              <option value="pending">Pending</option>
-            </select>
-          </div>
-        </div>
+
 
         {/* Results Count */}
         <div className="flex justify-between items-center mb-4">
@@ -314,52 +275,16 @@ const ReceiptHistory = () => {
             Showing {filteredReceipts.length} of {receipts?.length || 0} receipts
           </p>
           {filteredReceipts.length > 0 && (
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => {
-                const totalFiltered = filteredReceipts.reduce((sum, r) => sum + r.amount, 0);
-                toast({
-                  title: "Filtered Total",
-                  description: `Total amount: ${formatRupees(totalFiltered)}`,
-                });
-              }}>
-                <Eye className="h-4 w-4 mr-2" />
-                Show Filtered Total
-              </Button>
-              
-              <Button variant="outline" size="sm" onClick={() => {
-                const csvContent = [
-                  ['Receipt ID', 'Equipment', 'Amount', 'Status', 'Booking Period', 'Generated On'],
-                  ...filteredReceipts.map(receipt => [
-                    `#${receipt.id}`,
-                    receipt.metadata?.equipment_name || 'N/A',
-                    formatRupees(receipt.amount),
-                    receipt.status,
-                    receipt.metadata?.booking_dates 
-                      ? `${formatDate(receipt.metadata.booking_dates.start)} to ${formatDate(receipt.metadata.booking_dates.end)}`
-                      : 'N/A',
-                    formatDate(receipt.generatedAt)
-                  ])
-                ].map(row => row.join(',')).join('\n');
-                
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `receipts-${new Date().toISOString().split('T')[0]}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-                
-                toast({
-                  title: "Export Complete",
-                  description: `Exported ${filteredReceipts.length} receipts to CSV`,
-                });
-              }}>
-                <FileText className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
-            </div>
+            <Button variant="outline" size="sm" onClick={() => {
+              const totalFiltered = filteredReceipts.reduce((sum, r) => sum + r.amount, 0);
+              toast({
+                title: "Total Amount",
+                description: `Total: ${formatRupees(totalFiltered)}`,
+              });
+            }}>
+              <Eye className="h-4 w-4 mr-2" />
+              Show Total
+            </Button>
           )}
         </div>
 

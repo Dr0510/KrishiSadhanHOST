@@ -21,7 +21,9 @@ import {
   ImagePlus,
   ScrollText,
   Scale,
-  ArrowLeft
+  ArrowLeft,
+  MessageCircle,
+  Phone
 } from "lucide-react";
 import { z } from "zod";
 import { useState, useEffect } from "react";
@@ -373,6 +375,21 @@ export function MainNav() {
 
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                const phoneNumber = "919876543210";
+                const message = "Hello! I need help with farm equipment rental. Can you assist me?";
+                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+              }}
+              aria-label="Contact us on WhatsApp"
+              title="Contact Support"
+            >
+              <Phone className="h-5 w-5" />
+            </Button>
 
             <Link href="/dashboard">
               <Button
