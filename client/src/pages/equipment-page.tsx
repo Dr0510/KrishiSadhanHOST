@@ -16,12 +16,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
 import { CalendarHeatmap } from "@/components/ui/calendar-heatmap";
 import { useAuth } from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
+import { ReviewForm } from "@/components/review-form";
+import { PaymentGateway } from "@/components/payment-gateway";
 
 // Define the Review interface for this component
 interface ReviewType {
@@ -45,6 +46,9 @@ export default function EquipmentPage() {
   const [dialogKey, setDialogKey] = useState(0);
   const [imageKey, setImageKey] = useState(0); // Add this for forced re-render
   const [isImageRefreshing, setIsImageRefreshing] = useState(false);
+  const [showPaymentGateway, setShowPaymentGateway] = useState(false);
+  const [bookingData, setBookingData] = useState<any>(null);
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
 
   // Reset dates when dialog closes
   useEffect(() => {
@@ -113,23 +117,14 @@ export default function EquipmentPage() {
       }
     },
     onSuccess: (data) => {
+      console.log('Booking created successfully:', data);
+
+      // Set booking data for payment gateway
+      setBookingData(data);
+      setShowPaymentGateway(true);
       setIsDialogOpen(false);
       setStartDate(undefined);
       setEndDate(undefined);
-
-      if (data.booking && data.booking.id) {
-        setLocation(`/booking/${data.booking.id}`);
-        toast({
-          title: t("common.success"),
-          description: t("booking.success"),
-        });
-      } else {
-        toast({
-          title: t("common.error"),
-          description: t("booking.idMissing"),
-          variant: "destructive",
-        });
-      }
     },
     onError: (error: Error) => {
       toast({
@@ -482,6 +477,44 @@ export default function EquipmentPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Payment Gateway Dialog */}
+      {showPaymentGateway && bookingData && (
+        <Dialog open={showPaymentGateway} onOpenChange={setShowPaymentGateway}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>{t('payment.title', 'Complete Payment')}</DialogTitle>
+              <DialogDescription>
+                {t('payment.description', 'Complete your payment to confirm the booking')}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4 bg-muted/50">
+                <h4 className="font-medium mb-2">{t('booking.summary', 'Booking Summary')}</h4>
+                <div className="space-y-1 text-sm">
+                  <p><span className="font-medium">{t('equipment.name')}:</span> {equipment.name}</p>
+                  <p><span className="font-medium">{t('booking.dates')}:</span> {startDate && endDate && `${format(startDate, 'PP')} - ${format(endDate, 'PP')}`}</p>
+                </div>
+              </div>
+              <PaymentGateway
+                bookingId={bookingData.booking.id}
+                totalPrice={bookingData.booking.totalPrice}
+                onSuccess={() => {
+                  setShowPaymentGateway(false);
+                  setLocation('/dashboard');
+                }}
+                onError={(error) => {
+                  toast({
+                    title: t('payment.failed'),
+                    description: error.message,
+                    variant: "destructive",
+                  });
+                }}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       <div className="mt-8">
         <h2 className="text-2xl font-bold">{t("reviews.title")}</h2>

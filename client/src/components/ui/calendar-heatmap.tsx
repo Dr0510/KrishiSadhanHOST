@@ -126,6 +126,36 @@ export function CalendarHeatmap({
     }).format(amount);
   };
 
+  const handleDateClick = (date: Date) => {
+    if (!startDate || (startDate && endDate)) {
+      // Start new selection
+      setStartDate(date);
+      setEndDate(undefined);
+      onSelect?.(date, undefined);
+    } else if (startDate && !endDate) {
+      // Complete selection
+      let finalStartDate = startDate;
+      let finalEndDate = date;
+
+      if (date < startDate) {
+        // If end date is before start date, swap them
+        finalStartDate = date;
+        finalEndDate = startDate;
+      }
+
+      setStartDate(finalStartDate);
+      setEndDate(finalEndDate);
+      onSelect?.(finalStartDate, finalEndDate);
+
+      // Auto-trigger booking creation after a short delay
+      setTimeout(() => {
+        if (onConfirm) {
+          onConfirm();
+        }
+      }, 500);
+    }
+  };
+
   if (error) {
     return (
       <div className="space-y-4">
