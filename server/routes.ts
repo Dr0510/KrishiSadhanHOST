@@ -848,7 +848,7 @@ export function registerRoutes(app: Express): Server {
         ...receipt,
         amount: Number(receipt.amount), // Ensure amount is a number
         generatedAt: receipt.generatedAt.toISOString()
-      })));
+      }));
     } catch (error) {
       console.error('Error fetching receipts:', error);
       res.status(500).json({
@@ -1284,7 +1284,7 @@ export function registerRoutes(app: Express): Server {
 
       // Create PDF document with proper formatting options
       const doc = new PDFDocument({
-        margin: 50,
+        margin: 40,
         size: 'A4'
       });
 
@@ -1304,239 +1304,164 @@ export function registerRoutes(app: Express): Server {
       // Pipe the PDF document to the response stream
       doc.pipe(res);
 
-      // Add company header with styling
-      doc.fontSize(20)
-         .text('Agricultural Equipment Rental', { align: 'center' })
-         .moveDown(0.5);
+      // Professional PDF Content Generation
+      const pageWidth = 595.28; // A4 width in points
+      const margin = 40;
+      const contentWidth = pageWidth - (margin * 2);
 
-      doc.fontSize(14)
-         .text('Receipt', { align: 'center' })
-         .moveDown();
+      // Header with professional branding
+      doc.rect(0, 0, pageWidth, 80)
+         .fillAndStroke('#1e40af', '#1e40af');
 
-      // Add receipt details with proper formatting
-      doc.fontSize(12)
-         .text(`Receipt #: ${receipt.id}`)
-         .text(`Date: ${format(receipt.generatedAt, 'PPpp')}`)
-         .text(`Booking ID: ${booking.id}`)
-         .text(`Payment ID: ${receipt.razorpayPaymentId}`)
-         .moveDown();
-
-      // Add equipment details
-      doc.fontSize(12)
-         .text('Equipment Details', { underline: true })
-         .text(`Name: ${equipment.name}`)
-         .text(`Category: ${equipment.category}`)
-         .text(`Location: ${equipment.location}`)
-         .text(`Daily Rate: ₹${equipment.dailyRate}`)
-         .moveDown();
-
-      // Add booking period details
-      doc.text('Rental Period', { underline: true })
-         .text(`Start Date: ${format(booking.startDate, 'PPP')}`)
-         .text(`End Date: ${format(booking.endDate, 'PPP')}`)
-         .moveDown();
-
-      // Add payment details
-      doc.text('Payment Details', { underline: true })
-         .text(`Total Amount: ₹${receipt.amount / 100}`) //amount in rupees
-         .text(`Payment Status: ${receipt.status}`)
-         .text(`Payment Method: Razorpay`)
-         .moveDown();
-
-      // Add footer
-      doc.fontSize(10)
-         .text('Thank you for your business!', { align: 'center' })
-         .text(`Generated on: ${format(new Date(), 'PPpp')}`, { align: 'center' });
-
-      // Add page numbers
-      const pages = doc.bufferedPageRange();
-      for (let i = 0; i < pages.count; i++) {
-        doc.switchToPage(i);
-        doc.fontSize(8)
-           .text(
-             `Page ${i + 1} of ${pages.count}`,
-             50,
-             doc.page.height - 50,
-             { align: 'center' }
-           );
-      }
-
-      // Finalize the PDF document
-      doc.end();
-    } catch (error) {
-      console.error('Error generating receipt PDF:', error);
-      // Only send error if headers haven't been sent
-      if (!res.headersSent) {
-        res.status(500).json({
-          error: "Failed to generate receipt PDF",
-          details: error instanceof Error ? error.message : "Unknown error"
-        });
-      }
-    }
-  });
-
-  app.get("/api/receipts/:id/download", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-
-    try {
-      const receiptId = parseInt(req.params.id);
-      const receipt = await storage.getReceipt(receiptId);
-
-      if (!receipt) {
-        return res.status(404).json({ error: "Receipt not found" });
-      }
-
-      // Check if the receipt belongs to the authenticated user
-      if (receipt.userId !== req.user.id) {
-        return res.status(403).json({ error: "Not authorized to access this receipt" });
-      }
-
-      // Get related booking and equipment details
-      const booking = await storage.getBooking(receipt.bookingId);
-      const equipment = booking ? await storage.getEquipment(booking.equipmentId) : null;
-      const user = await storage.getUser(receipt.userId);
-
-      // Create PDF document
-      const doc = new PDFDocument({
-        size: 'A4',
-        margin: 50,
-        info: {
-          Title: `Receipt #${receipt.id}`,
-          Author: 'Agricultural Equipment Rental',
-        }
-      });
-
-      // Set response headers
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename=receipt-${receipt.id}.pdf`);
-
-      // Pipe the PDF directly to the response
-      doc.pipe(res);
-
-      // Add company logo or header with improved styling
       doc.font('Helvetica-Bold')
-         .fontSize(24)
-         .text('Agricultural Equipment Rental', { align: 'center' })
-         .fontSize(16)
-         .text('Payment Receipt', { align: 'center' })
-         .moveDown();
+         .fontSize(28)
+         .fillColor('#ffffff')
+         .text('AgriEquip Rentals', margin, 25);
 
-      // Add receipt details with better formatting
       doc.font('Helvetica')
+         .fontSize(11)
+         .fillColor('#ffffff')
+         .text('Premium Agricultural Equipment Rental Service', margin, 55);
+
+      // Company details on right side of header
+      doc.fontSize(10)
+         .text('Email: support@agriculturequipment.com', pageWidth - 220, 35)
+         .text('Phone: +91-9876543210', pageWidth - 220, 50)
+         .text('www.agriculturequipment.com', pageWidth - 220, 65);
+
+      // Receipt title section
+      doc.fillColor('#000000')
+         .font('Helvetica-Bold')
+         .fontSize(20)
+         .text('PAYMENT RECEIPT', margin, 110);
+
+      // Receipt info and status in a styled box
+      const statusColor = receipt.status === 'paid' ? '#16a34a' : '#eab308';
+      const statusText = receipt.status === 'paid' ? 'PAID' : 'PENDING';
+
+      doc.rect(margin, 140, contentWidth, 60)
+         .fillAndStroke('#f8fafc', '#e2e8f0');
+
+      doc.fillColor('#374151')
+         .font('Helvetica-Bold')
          .fontSize(12)
-         .text(`Receipt Number: #${receipt.id}`, { align: 'right' })
-         .text(`Date: ${format(new Date(receipt.generatedAt), 'PPP')}`, { align: 'right' })
-         .moveDown();
+         .text(`Receipt #${receipt.id}`, margin + 15, 155)
+         .text(`Booking #${receipt.bookingId}`, margin + 15, 170)
+         .text(`Date: ${format(receipt.generatedAt, 'dd MMM yyyy')}`, margin + 15, 185);
 
-      // Add a styled separator
-      doc.moveTo(50, doc.y)
-         .lineTo(545, doc.y)
-         .lineWidth(1)
-         .strokeColor('#CCCCCC')
-         .stroke()
-         .moveDown();
+      // Status badge
+      doc.rect(pageWidth - 120, 150, 80, 25)
+         .fillAndStroke(statusColor, statusColor);
 
-      // Equipment and booking details with improved layout
-      if (equipment && booking) {
-        doc.font('Helvetica-Bold')
-           .fontSize(14)
-           .fillColor('#333333')
-           .text('Equipment Details', { underline: true })
-           .font('Helvetica')
-           .fontSize(12)
-           .fillColor('black')
-           .moveDown(0.5);
-
-        // Create a table-like structure for equipment details
-        const detailsTable = {
-          headers: ['Equipment Name', 'Category', 'Location'],
-          rows: [[equipment.name, equipment.category, equipment.location]]
-        };
-
-        let xPos = 50;
-        detailsTable.headers.forEach(header => {
-          doc.text(header, xPos, doc.y, { width: 165, align: 'left' });
-          xPos += 165;
-        });
-
-        doc.moveDown(0.5);
-        xPos = 50;
-        detailsTable.rows[0].forEach(cell => {
-          doc.text(cell, xPos, doc.y, { width: 165, align: 'left' });
-          xPos += 165;
-        });
-
-        doc.moveDown()
-           .font('Helvetica-Bold')
-           .text('Booking Period:', { underline: true })
-           .font('Helvetica')
-           .text(`From: ${format(new Date(booking.startDate), 'PPP')}`)
-           .text(`To: ${format(new Date(booking.endDate), 'PPP')}`)
-           .moveDown();
-      }
-
-      // Payment details with enhanced styling
-      doc.font('Helvetica-Bold')
-         .fontSize(14)
-         .text('Payment Details', { underline: true })
-         .font('Helvetica')
+      doc.fillColor('#ffffff')
+         .font('Helvetica-Bold')
          .fontSize(12)
-         .moveDown(0.5);
+         .text(statusText, pageWidth - 115, 158, { align: 'center', width: 70 });
 
-      const paymentDetails = [
-        ['Payment ID:', receipt.razorpayPaymentId],
-        ['Payment Method:', receipt.metadata.payment_method || 'Online Payment'],
-        ['Status:', receipt.status.toUpperCase()]
-      ];
-
-      paymentDetails.forEach(([label, value]) => {
-        doc.text(`${label} ${value}`, { continued: false });
-      });
-
-      doc.moveDown();
-
-      // Add amount in a styled box
-      const boxTop = doc.y;
-      doc.rect(50, boxTop, 495, 40)
-         .fillAndStroke('#f8f9fa', '#e9ecef');
-
-      doc.fill('#000000')
+      // Customer and Equipment Information Section
+      doc.fillColor('#000000')
          .font('Helvetica-Bold')
          .fontSize(14)
-         .text(
-           'Total Amount: ' + 
-           new Intl.NumberFormat('hi-IN', {
-             style: 'currency',
-             currency: 'INR',
-             maximumFractionDigits: 0
-           }).format(receipt.amount / 100), // Convert paise to rupees for display
-           60,
-           boxTop + 12,
-           { align: 'right', width: 475 }
-         );
+         .text('Equipment Details', margin, 230);
 
-      // Add styled footer
-      const footerTop = doc.page.height - 100;
+      doc.rect(margin, 250, contentWidth, 80)
+         .fillAndStroke('#f1f5f9', '#cbd5e1');
+
+      doc.fillColor('#374151')
+         .font('Helvetica')
+         .fontSize(11)
+         .text(`Equipment Name: ${equipment.name}`, margin + 15, 265)
+         .text(`Category: ${equipment.category}`, margin + 15, 280)
+         .text(`Location: ${equipment.location}`, margin + 15, 295)
+         .text(`Daily Rate: ₹${(equipment.dailyRate / 100).toLocaleString('en-IN')}`, margin + 15, 310);
+
+      // Booking Information Section
+      doc.font('Helvetica-Bold')
+         .fontSize(14)
+         .text('Booking Information', margin, 360);
+
+      const rentalDays = Math.ceil((new Date(booking.endDate).getTime() - new Date(booking.startDate).getTime()) / (1000 * 60 * 60 * 24));
+
+      doc.rect(margin, 380, contentWidth, 80)
+         .fillAndStroke('#ecfdf5', '#bbf7d0');
+
+      doc.fillColor('#374151')
+         .font('Helvetica')
+         .fontSize(11)
+         .text(`Start Date: ${format(booking.startDate, 'dd MMM yyyy')}`, margin + 15, 395)
+         .text(`End Date: ${format(booking.endDate, 'dd MMM yyyy')}`, margin + 15, 410)
+         .text(`Rental Period: ${rentalDays} day(s)`, margin + 15, 425)
+         .text(`Status: ${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}`, margin + 15, 440);
+
+      // Payment Information Section
+      doc.font('Helvetica-Bold')
+         .fontSize(14)
+         .text('Payment Information', margin, 490);
+
+      doc.rect(margin, 510, contentWidth, 80)
+         .fillAndStroke('#fef3c7', '#fbbf24');
+
+      doc.fillColor('#374151')
+         .font('Helvetica')
+         .fontSize(11)
+         .text(`Payment ID: ${receipt.razorpayPaymentId}`, margin + 15, 525)
+         .text(`Payment Method: ${receipt.metadata.payment_method || 'Online Payment'}`, margin + 15, 540)
+         .text(`Transaction Date: ${format(receipt.generatedAt, 'dd MMM yyyy, hh:mm a')}`, margin + 15, 555);
+
+      // Cost Breakdown Section
+      doc.font('Helvetica-Bold')
+         .fontSize(14)
+         .text('Cost Breakdown', margin, 620);
+
+      // Create a table for cost breakdown
+      const tableTop = 640;
+      doc.rect(margin, tableTop, contentWidth, 100)
+         .fillAndStroke('#ffffff', '#e2e8f0');
+
+      // Table headers
+      doc.rect(margin, tableTop, contentWidth, 25)
+         .fillAndStroke('#f1f5f9', '#cbd5e1');
+
+      doc.fillColor('#374151')
+         .font('Helvetica-Bold')
+         .fontSize(10)
+         .text('Description', margin + 10, tableTop + 8)
+         .text('Days', margin + 250, tableTop + 8, { align: 'center', width: 60 })
+         .text('Rate/Day', margin + 350, tableTop + 8, { align: 'center', width: 80 })
+         .text('Amount', margin + 450, tableTop + 8, { align: 'right', width: 80 });
+
+      // Table content
       doc.font('Helvetica')
          .fontSize(10)
-         .fillColor('#666666')
-         .text('Thank you for using our service', 50, footerTop, { align: 'center' })
-         .moveDown(0.5)
-         .text('For any queries, please contact support@agriculturequipment.com', { align: 'center' })
-         .moveDown(0.5)
-         .text(`Generated on ${format(new Date(), 'PPP')}`, { align: 'center' });
+         .text(`${equipment.name} Rental`, margin + 10, tableTop + 35)
+         .text(`${rentalDays}`, margin + 250, tableTop + 35, { align: 'center', width: 60 })
+         .text(`₹${(equipment.dailyRate / 100).toLocaleString('en-IN')}`, margin + 350, tableTop + 35, { align: 'center', width: 80 })
+         .text(`₹${(receipt.amount / 100).toLocaleString('en-IN')}`, margin + 450, tableTop + 35, { align: 'right', width: 80 });
 
-      // Add page numbers
-      const pages = doc.bufferedPageRange();
-      for (let i = 0; i < pages.count; i++) {
-        doc.switchToPage(i);
-        doc.text(
-          `Page ${i + 1} of ${pages.count}`,
-          50,
-          doc.page.height - 50,
-          { align: 'center' }
-        );
-      }
+      // Total amount section
+      doc.rect(margin, tableTop + 65, contentWidth, 35)
+         .fillAndStroke('#1e40af', '#1e40af');
+
+      doc.fillColor('#ffffff')
+         .font('Helvetica-Bold')
+         .fontSize(14)
+         .text('Total Amount Paid:', margin + 10, tableTop + 78)
+         .text(`₹${(receipt.amount / 100).toLocaleString('en-IN')}`, margin + 450, tableTop + 78, { align: 'right', width: 80 });
+
+      // Footer section
+      const footerTop = 780;
+      doc.rect(0, footerTop, pageWidth, 62)
+         .fillAndStroke('#f8fafc', '#e2e8f0');
+
+      doc.fillColor('#6b7280')
+         .font('Helvetica')
+         .fontSize(9)
+         .text('Thank you for choosing AgriEquip Rentals!', margin, footerTop + 15)
+         .text('This is a computer-generated receipt and does not require a signature.', margin, footerTop + 30)
+         .text(`Generated on ${format(new Date(), 'dd MMM yyyy, hh:mm a')}`, margin, footerTop + 45);
+
+      doc.text('For support: support@agriculturequipment.com | +91-9876543210', pageWidth - 300, footerTop + 15, { align: 'right', width: 260 })
+         .text('Terms & Conditions apply. Visit our website for details.', pageWidth - 300, footerTop + 30, { align: 'right', width: 260 });
 
       // Finalize the PDF
       doc.end();
@@ -1620,7 +1545,7 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/chatbot", async (req, res) => {
     try {
       const { message } = req.body;
-      
+
       if (!message || typeof message !== 'string') {
         return res.status(400).json({ error: 'Message is required' });
       }
@@ -1668,7 +1593,7 @@ User message: ${message}`;
       res.json({ response: text });
     } catch (error) {
       console.error('Gemini API error:', error);
-      
+
       // Handle specific Gemini API errors
       let errorMessage = 'Failed to get response from AI assistant';
       if (error instanceof Error) {
@@ -1680,7 +1605,7 @@ User message: ${message}`;
           errorMessage = 'AI service configuration issue. Please contact support.';
         }
       }
-      
+
       res.status(500).json({ 
         error: errorMessage,
         details: error instanceof Error ? error.message : 'Unknown error'
