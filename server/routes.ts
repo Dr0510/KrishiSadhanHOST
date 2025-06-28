@@ -1112,7 +1112,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Equipment comparison routes
-  app.post("/api/comparisons/comparisons/add/:equipmentId", async (req, res) => {
+  app.post("/api/comparisons/add/:equipmentId", async (req, res) => {
     if (!req.isAuthenticated() || !req.user) {
       return res.sendStatus(401);
     }
@@ -1121,7 +1121,8 @@ export function registerRoutes(app: Express): Server {
       const equipmentId = parseInt(req.params.equipmentId);
       await storage.addToComparison(req.user.id, equipmentId);
       res.sendStatus(200);
-    } catch (error) {      console.error('Error adding to comparison:', error);
+    } catch (error) {
+      console.error('Error adding to comparison:', error);
       res.status(500).json({ error: "Failed to add to comparison" });
     }
   });
