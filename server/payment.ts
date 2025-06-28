@@ -183,11 +183,11 @@ export async function generateReceipt(bookingId: number, paymentId: string) {
     const pdfBuffer = doc.output('arraybuffer');
     const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
 
-    // Create receipt record in database with amount in paise
+    // Create receipt record in database - use booking total price for consistency
     const receiptData = {
       bookingId,
       userId: booking.userId,
-      amount: payment.amount, // Amount in paise from Razorpay
+      amount: booking.totalPrice, // Use booking amount in rupees for consistency
       status: payment.status,
       razorpayPaymentId: paymentId,
       pdfUrl: `data:application/pdf;base64,${pdfBase64}`,

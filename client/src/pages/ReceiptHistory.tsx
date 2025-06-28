@@ -210,6 +210,9 @@ const ReceiptHistory = () => {
                   {t("receipts.bookingPeriod", "Booking Period")}
                 </TableHead>
                 <TableHead className="font-bold">
+                  {t("receipts.amount", "Amount")}
+                </TableHead>
+                <TableHead className="font-bold">
                   {t("receipts.paymentStatus", "Payment Status")}
                 </TableHead>
                 <TableHead className="font-bold">
@@ -243,6 +246,9 @@ const ReceiptHistory = () => {
                       ) : (
                         t("common.notAvailable", "N/A")
                       )}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      ₹{receipt.amount.toLocaleString('en-IN')}
                     </TableCell>
                     <TableCell>
                       <span

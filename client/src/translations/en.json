@@ -125,6 +125,19 @@
     "to": "to",
     "notAvailable": "N/A"
   },
+  "filters": {
+    "searchPlaceholder": "Search by name, category, or location...",
+    "category": "Category",
+    "selectCategory": "Select Category",
+    "priceRange": "Price Range (per day)",
+    "location": "Location",
+    "locationPlaceholder": "Enter location...",
+    "reset": "Reset Filters",
+    "radius": "Search Radius (km)",
+    "seasonal": "Seasonal Availability",
+    "locationUpdated": "Location updated",
+    "locationFilterApplied": "Location filter applied"
+  },
   "branding": {
     "name": "KrishiSadhan",
     "tagline": "Rent Farm Equipment with Ease 🚜",
@@ -191,7 +204,10 @@
       "verificationError": "Please try again or contact support.",
       "generic": "Failed to initiate payment",
       "confirmed": "Your booking has been confirmed",
-      "total": "Total Amount: ₹{{amount}}"
+      "total": "Total Amount: ₹{{amount}}",
+      "success": "Payment Successful",
+      "confirmed": "Your booking has been confirmed.",
+      "payNow": "Pay Now"
     },
     "welcomePrefix": "Welcome",
     "noEquipment": "No equipment listed",
@@ -399,6 +415,9 @@
       "pending": "Pending",
       "failed": "Failed"
     }
+  },
+  "receipt": {
+    "downloading": "Downloading..."
   },
   "map": {
     "listView": "List View",

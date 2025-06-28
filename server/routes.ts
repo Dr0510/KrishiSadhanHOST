@@ -1306,7 +1306,7 @@ export function registerRoutes(app: Express): Server {
       doc.pipe(res);
 
       // Helper function to format currency consistently with proper styling
-      const formatAmount = (amount) => {
+      const formatAmount = (amount: number) => {
         return `₹${Math.floor(amount / 100).toLocaleString('en-IN')}`;
       };
 
