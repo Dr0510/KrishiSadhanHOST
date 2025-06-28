@@ -1314,15 +1314,46 @@ export function registerRoutes(app: Express): Server {
       doc.rect(0, 0, pageWidth, 80)
          .fillAndStroke('#228B22', '#228B22'); // Forest Green
 
-      // Company Logo with proper branding
-      doc.circle(margin + 30, 40, 25)
-         .fillAndStroke('#ffffff', '#ffffff');
-      
-      // Brand logo text
-      doc.fillColor('#228B22')
+      // Professional KrishiSadhan Logo Design
+      const logoX = margin + 15;
+      const logoY = 20;
+      const logoSize = 40;
+
+      // Logo background circle
+      doc.circle(logoX + logoSize/2, logoY + logoSize/2, logoSize/2)
+         .fillAndStroke('#ffffff', '#228B22')
+         .lineWidth(2);
+
+      // Tractor silhouette design
+      doc.fillColor('#228B22');
+
+      // Tractor body (main chassis)
+      doc.rect(logoX + 8, logoY + 20, 24, 8)
+         .fill();
+
+      // Tractor cabin
+      doc.rect(logoX + 20, logoY + 12, 12, 8)
+         .fill();
+
+      // Large rear wheel
+      doc.circle(logoX + 28, logoY + 32, 6)
+         .fillAndStroke('#228B22', '#ffffff')
+         .lineWidth(1);
+
+      // Small front wheel  
+      doc.circle(logoX + 12, logoY + 32, 4)
+         .fillAndStroke('#228B22', '#ffffff')
+         .lineWidth(1);
+
+      // Exhaust pipe
+      doc.rect(logoX + 26, logoY + 8, 2, 4)
+         .fill();
+
+      // KS initials in center
+      doc.fillColor('#ffffff')
          .font('Helvetica-Bold')
-         .fontSize(20)
-         .text('🌾', margin + 20, 30);
+         .fontSize(8)
+         .text('KS', logoX + logoSize/2 - 6, logoY + logoSize/2 - 3);
 
       // Company Name and Details
       doc.font('Helvetica-Bold')
