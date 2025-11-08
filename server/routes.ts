@@ -1675,13 +1675,13 @@ Message: ${message}`;
 
       console.log('Detected language:', detectedLanguage);
 
-      const languageNames = {
+      const languageNames: Record<string, string> = {
         'en': 'English',
         'hi': 'Hindi',
         'mr': 'Marathi'
       };
 
-      const languageInstructions = {
+      const languageInstructions: Record<string, string> = {
         'en': 'Respond in English.',
         'hi': 'उपयोगकर्ता ने हिंदी में सवाल पूछा है। कृपया हिंदी में जवाब दें।',
         'mr': 'वापरकर्त्याने मराठीत प्रश्न विचारला आहे. कृपया मराठीत उत्तर द्या।'

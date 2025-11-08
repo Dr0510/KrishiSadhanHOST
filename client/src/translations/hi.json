@@ -113,7 +113,10 @@
     "compare": "उपकरण तुलना करें",
     "backToHome": "वापस मुख्यपृष्ठ पर जाएं",
     "menu": "मेन्यू",
-    "logout": "लॉग आउट"
+    "logout": "लॉग आउट",
+    "categories": "श्रेणियाँ",
+    "admin": "व्यवस्थापक",
+    "profile": "प्रोफ़ाइल"
   },
   "branding": {
     "name": "कृषि साधन",
@@ -325,18 +328,34 @@
     "harvester": "कंबाइन हार्वेस्टर",
     "seeder": "बीज बोने के उपकरण",
     "plough": "हल और टिलर",
+    "plows": "हल और टिलर",
     "sprayer": "छिड़काव उपकरण",
     "cultivator": "कल्टीवेटर",
+    "cultivators": "कल्टीवेटर",
     "thresher": "थ्रेशर",
     "combine": "कंबाइन उपकरण",
-    "rotavator": "रोटावेटर"
+    "rotavator": "रोटावेटर",
+    "fertilizer": "उर्वरक उपकरण",
+    "other": "अन्य उपकरण"
   },
   "receipt": {
     "title": "रसीद",
     "error": "रसीद डाउनलोड करने में त्रुटि हुई",
     "count_one": "समीक्षा",
     "count_other": "समीक्षाएं",
-    "download": "डाउनलोड करें"
+    "download": "डाउनलोड करें",
+    "downloadSuccess": "रसीद डाउनलोड हो गई",
+    "downloadSuccessDesc": "आपकी रसीद सफलतापूर्वक डाउनलोड हो गई है।",
+    "downloadError": "रसीद डाउनलोड करने में त्रुटि",
+    "downloadFailed": "रसीद डाउनलोड करने में विफल। कृपया पुनः प्रयास करें।",
+    "notFound": "रसीद नहीं मिली",
+    "paymentId": "भुगतान आईडी",
+    "method": "विधि",
+    "status": "स्थिति",
+    "equipmentDetails": "उपकरण विवरण",
+    "paymentDetails": "भुगतान विवरण",
+    "totalAmount": "कुल राशि",
+    "downloading": "डाउनलोड हो रहा है..."
   },
   "map": {
     "yourLocation": "आपका स्थान",

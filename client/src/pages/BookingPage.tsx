@@ -176,8 +176,52 @@ export default function BookingPage() {
                     <Button
                       variant="outline"
                       className="mt-4"
-                      onClick={() => {
-                        console.log('Download receipt clicked for booking:', booking.id);
+                      onClick={async () => {
+                        try {
+                          const response = await fetch(`/api/bookings/${booking.id}/receipt`, {
+                            credentials: 'include'
+                          });
+                          
+                          if (!response.ok) {
+                            throw new Error('Receipt not found');
+                          }
+                          
+                          const receipt = await response.json();
+                          
+                          if (receipt && receipt.id) {
+                            const downloadResponse = await fetch(`/api/receipts/${receipt.id}/download`, {
+                              credentials: 'include'
+                            });
+                            
+                            if (!downloadResponse.ok) {
+                              throw new Error('Failed to download receipt');
+                            }
+                            
+                            const blob = await downloadResponse.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `receipt-${receipt.id}.pdf`;
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+                            
+                            toast({
+                              title: t('receipt.downloadSuccess', 'Receipt Downloaded'),
+                              description: t('receipt.downloadSuccessDesc', 'Your receipt has been downloaded successfully.'),
+                            });
+                          } else {
+                            throw new Error('Receipt data is invalid');
+                          }
+                        } catch (error) {
+                          console.error('Error downloading receipt:', error);
+                          toast({
+                            title: t('receipt.error', 'Error'),
+                            description: t('receipt.downloadError', 'Failed to download receipt. Please try again.'),
+                            variant: "destructive",
+                          });
+                        }
                       }}
                     >
                       <Download className="w-4 h-4 mr-2" />

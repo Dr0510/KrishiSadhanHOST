@@ -118,7 +118,10 @@
     "compare": "उपकरणे तुलना करा",
     "backToHome": "मुख्यपृष्ठावर परत जा",
     "menu": "मेनू",
-    "logout": "लॉगआउट"
+    "logout": "लॉगआउट",
+    "categories": "श्रेणी",
+    "admin": "प्रशासक",
+    "profile": "प्रोफाइल"
   },
   "comparison": {
     "title": "उपकरणे तुलना",
@@ -334,23 +337,43 @@
     "noResults": "कोणताही परिणाम सापडला नाही"
   },
   "categories": {
+    "tractors": "ट्रॅक्टर",
+    "harvesters": "हार्वेस्टर",
+    "seeders": "सीडर",
+    "sprayers": "स्प्रेयर",
+    "irrigation": "सिंचन",
     "tractor": "ट्रॅक्टर आणि हार्वेस्टर",
     "harvester": "कंबाइन हार्वेस्टर",
     "seeder": "पेरणी उपकरणे",
     "plough": "नांगर आणि टिलर",
+    "plows": "नांगर आणि टिलर",
     "sprayer": "फवारणी उपकरणे",
     "cultivator": "कल्टिवेटर",
+    "cultivators": "कल्टिवेटर",
     "thresher": "थ्रेशर",
     "combine": "कंबाइन उपकरणे",
     "rotavator": "रोटावेटर",
-    "irrigation": "सिंचन प्रणाली"
+    "fertilizer": "खत उपकरणे",
+    "other": "इतर उपकरणे"
   },
   "receipt": {
     "title": "पावती",
     "error": "पावती डाउनलोड करण्यात त्रुटी आली",
     "download": "डाउनलोड करा",
     "count_one": "पुनरावलोकन",
-    "count_other": "पुनरावलोकने"
+    "count_other": "पुनरावलोकने",
+    "downloadSuccess": "पावती डाउनलोड झाली",
+    "downloadSuccessDesc": "तुमची पावती यशस्वीरित्या डाउनलोड झाली आहे.",
+    "downloadError": "पावती डाउनलोड करताना त्रुटी",
+    "downloadFailed": "पावती डाउनलोड करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.",
+    "notFound": "पावती सापडली नाही",
+    "paymentId": "पेमेंट आयडी",
+    "method": "पद्धत",
+    "status": "स्थिती",
+    "equipmentDetails": "उपकरण तपशील",
+    "paymentDetails": "पेमेंट तपशील",
+    "totalAmount": "एकूण रक्कम",
+    "downloading": "डाउनलोड होत आहे..."
   },
   "seasons": {
     "spring": "वसंत",
