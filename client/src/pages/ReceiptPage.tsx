@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Download } from "lucide-react";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import { MainNav } from "@/components/main-nav";
 
 interface Receipt {
@@ -37,30 +37,30 @@ export default function ReceiptPage() {
     queryKey: [`/api/receipts/${id}`],
     queryFn: async () => {
       const response = await fetch(`/api/receipts/${id}`, {
-        credentials: 'include'
+        credentials: "include",
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to fetch receipt');
+        throw new Error(error.message || "Failed to fetch receipt");
       }
       return response.json();
     },
-    enabled: !!id
+    enabled: !!id,
   });
 
   const handleDownload = async () => {
     try {
       const response = await fetch(`/api/receipts/${id}/download`, {
-        credentials: 'include'
+        credentials: "include",
       });
 
       if (!response.ok) {
-        throw new Error('Failed to download receipt');
+        throw new Error("Failed to download receipt");
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = `receipt-${id}.pdf`;
       document.body.appendChild(a);
@@ -68,7 +68,7 @@ export default function ReceiptPage() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Download error:', error);
+      console.error("Download error:", error);
     }
   };
 
@@ -77,7 +77,7 @@ export default function ReceiptPage() {
       <div className="min-h-screen bg-background">
         <MainNav />
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <Loader2 className="h-8 w-8 animate-spin" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </div>
     );
@@ -89,10 +89,16 @@ export default function ReceiptPage() {
         <MainNav />
         <div className="container mx-auto px-4 py-8">
           <Card>
-            <CardContent className="p-6">
-              <h1 className="text-2xl font-bold mb-4 text-destructive">
-                {t('receipt.notFound', 'Receipt Not Found')}
+            <CardContent className="p-6 text-center">
+              <h1 className="text-2xl font-bold mb-2 text-destructive">
+                {t("receipt.notFound", "Receipt Not Found")}
               </h1>
+              <p className="text-muted-foreground">
+                {t(
+                  "receipt.notFoundDesc",
+                  "This receipt does not exist or has been deleted.",
+                )}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -104,78 +110,109 @@ export default function ReceiptPage() {
     <div className="min-h-screen bg-background">
       <MainNav />
       <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <Card className="shadow-lg">
+        <Card className="shadow-lg border border-gray-200 rounded-xl">
           <CardContent className="p-8">
+            {/* Header */}
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h1 className="text-3xl font-bold text-primary mb-2">
-                  {t('receipt.title', 'Payment Receipt')}
+                  {t("receipt.title", "Payment Receipt")}
                 </h1>
                 <p className="text-muted-foreground">
-                  #{receipt.id} | {format(new Date(receipt.timestamp), 'PPP')}
+                  #{receipt.id} | {format(new Date(receipt.timestamp), "PPP")}
                 </p>
               </div>
-              <Button 
+              <Button
                 variant="default"
                 size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={handleDownload}
               >
                 <Download className="w-4 h-4 mr-2" />
-                {t('receipt.download', 'Download PDF')}
+                {t("receipt.download", "Download PDF")}
               </Button>
             </div>
 
+            {/* Details Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
               <div>
-                <h2 className="font-semibold mb-2">{t('receipt.equipmentDetails', 'Equipment Details')}</h2>
-                <p className="text-muted-foreground">{receipt.metadata.equipment_name}</p>
-                <p className="text-muted-foreground">{receipt.metadata.location}</p>
+                <h2 className="font-semibold mb-2 text-lg text-primary">
+                  {t("receipt.equipmentDetails", "Equipment Details")}
+                </h2>
+                <p className="text-muted-foreground">
+                  {receipt.metadata.equipment_name || "N/A"}
+                </p>
+                <p className="text-muted-foreground">
+                  {receipt.metadata.location || "—"}
+                </p>
                 <p className="text-muted-foreground">
                   {receipt.metadata.booking_dates && (
                     <>
-                      {format(new Date(receipt.metadata.booking_dates.start), 'PPP')} - 
-                      {format(new Date(receipt.metadata.booking_dates.end), 'PPP')}
+                      {format(
+                        new Date(receipt.metadata.booking_dates.start),
+                        "PPP",
+                      )}{" "}
+                      -{" "}
+                      {format(
+                        new Date(receipt.metadata.booking_dates.end),
+                        "PPP",
+                      )}
                     </>
                   )}
                 </p>
               </div>
 
               <div>
-                <h2 className="font-semibold mb-2">{t('receipt.paymentDetails', 'Payment Details')}</h2>
+                <h2 className="font-semibold mb-2 text-lg text-primary">
+                  {t("receipt.paymentDetails", "Payment Details")}
+                </h2>
                 <p className="text-muted-foreground">
-                  {t('receipt.paymentId', 'Payment ID')}: {receipt.paymentId}
+                  {t("receipt.paymentId", "Payment ID")}: {receipt.paymentId}
                 </p>
                 <p className="text-muted-foreground">
-                  {t('receipt.method', 'Method')}: {receipt.method}
+                  {t("receipt.method", "Method")}: {receipt.method}
                 </p>
                 <p className="text-muted-foreground">
-                  {t('receipt.status', 'Status')}: 
-                  <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                    receipt.status === 'paid' 
-                      ? 'bg-green-100 text-green-800 border-green-200'
-                      : 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                  }`}>
-                    {receipt.status === 'paid' && <span className="text-green-600 mr-1">✓</span>}
-                    {receipt.status === 'pending' && <span className="text-yellow-600 mr-1">⏳</span>}
-                    {receipt.status.charAt(0).toUpperCase() + receipt.status.slice(1)}
+                  {t("receipt.status", "Status")}:{" "}
+                  <span
+                    className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                      receipt.status === "paid"
+                        ? "bg-green-100 text-green-800 border-green-200"
+                        : "bg-yellow-100 text-yellow-800 border-yellow-200"
+                    }`}
+                  >
+                    {receipt.status === "paid" && (
+                      <span className="text-green-600 mr-1">✓</span>
+                    )}
+                    {receipt.status === "pending" && (
+                      <span className="text-yellow-600 mr-1">⏳</span>
+                    )}
+                    {receipt.status.charAt(0).toUpperCase() +
+                      receipt.status.slice(1)}
                   </span>
                 </p>
               </div>
             </div>
 
+            {/* Total Section */}
             <div className="border-t pt-6">
               <div className="flex justify-between items-center text-xl font-semibold">
-                <span>{t('receipt.totalAmount', 'Total Amount')}</span>
-                <span>
-                  {new Intl.NumberFormat('en-IN', {
-                    style: 'currency',
-                    currency: receipt.currency || 'INR',
-                    maximumFractionDigits: 0
-                  }).format(Number(receipt.amount) || 0)}
+                <span>{t("receipt.totalAmount", "Total Amount")}</span>
+                <span className="text-green-700 font-bold tracking-wide">
+                  {new Intl.NumberFormat("en-IN", {
+                    style: "currency",
+                    currency: receipt.currency || "INR",
+                    maximumFractionDigits: 0,
+                  }).format((Number(receipt.amount) || 0) / 100)}
                 </span>
               </div>
             </div>
+
+            {/* Footer */}
+            <p className="text-xs text-muted-foreground text-center mt-6">
+              Thank you for using AgroRental. Please keep this receipt for your
+              records.
+            </p>
           </CardContent>
         </Card>
       </div>
