@@ -10,14 +10,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <img 
-                src="https://drive.google.com/uc?export=view&id=1M3Lw-_es7GWYIJxUlatA61uapm38ywCd" 
-                alt="KrishiSadhan Logo" 
-                className="h-6 w-6 object-contain"
-              />
-              <span className="text-xl font-bold">{t('branding.name', 'KrishiSadhan')}</span>
-            </div>
+            <h3 className="font-semibold mb-3">{t('branding.name')}</h3>
             <p className="text-sm text-muted-foreground">
               {t('branding.description')}
             </p>

@@ -60,14 +60,14 @@ export async function createPaymentSession(
       name: "KrishiSadhan",
       description: `Smart Farm Equipment Rental – ${equipmentName}`,
       image:
-        "https://drive.google.com/uc?export=view&id=1M3Lw-_es7GWYIJxUlatA61uapm38ywCd",
+        "https://drive.google.com/file/d/1M3Lw-_es7GWYIJxUlatA61uapm38ywCd/view?usp=sharing", // optional: add your logo URL
       prefill: {
         name: "",
         email: "",
         contact: "",
       },
       theme: {
-        color: "#1B5E20",
+        color: "#1B5E20", // ✅ green accent (optional, matches your brand)
       },
     };
     console.log("Returning payment configuration:", {
