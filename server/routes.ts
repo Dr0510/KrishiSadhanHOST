@@ -1657,7 +1657,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       // Create a comprehensive system prompt for farm equipment rental context
       const systemPrompt = `You are a helpful farm equipment rental assistant for KrishiSadhan, an agricultural equipment rental platform. You help farmers and agricultural workers with:
