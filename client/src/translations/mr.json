@@ -258,7 +258,8 @@
     "contact": "संपर्क साधा",
     "email": "ईमेल: support@krishisadhan.com",
     "phone": "फोन: (555) 123-4567",
-    "copyright": "© 2025 कृषी साधन। सर्व हक्क राखीव।"
+    "copyright": "© {{year}} कृषी साधन। सर्व हक्क राखीव।",
+    "allRightsReserved": "सर्व हक्क राखीव"
   },
   "profile": {
     "title": "प्रोफाइल अपडेट करा",

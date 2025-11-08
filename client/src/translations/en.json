@@ -267,7 +267,8 @@
     "contact": "Contact Us",
     "email": "Email: support@krishisadhan.com",
     "phone": "Phone: (555) 123-4567",
-    "copyright": "© 2023 KrishiSadhan. All rights reserved."
+    "copyright": "© {{year}} KrishiSadhan. All rights reserved.",
+    "allRightsReserved": "All rights reserved"
   },
   "profile": {
     "edit": "Edit Profile",

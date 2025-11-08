@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 export function Footer() {
   const { t } = useTranslation();
+  const currentYear = new Date().getFullYear();
 
   return (
     <footer className="border-t mt-auto">
@@ -52,7 +53,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t mt-6 pt-6 text-center text-sm text-muted-foreground">
-          {t('footer.copyright')}
+          {t('footer.copyright', { year: currentYear })}
         </div>
       </div>
     </footer>
