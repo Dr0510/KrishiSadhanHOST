@@ -13,7 +13,6 @@ import { createPaymentSession, verifyPaymentSignature, generateReceipt } from ".
 import crypto from 'crypto';
 import PDFDocument from 'pdfkit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import languageDetector from 'langdetect';
 
 // Configure cloudinary
 import { v2 as cloudinary } from 'cloudinary';
@@ -1657,20 +1656,24 @@ export function registerRoutes(app: Express): Server {
         return res.status(500).json({ error: 'Google AI API key not configured' });
       }
 
-      // Detect language
-      let detectedLanguage = 'en'; // Default to English
-      try {
-        const detected = languageDetector.detect(message);
-        if (detected && detected.length > 0) {
-          detectedLanguage = detected[0].lang;
-        }
-      } catch (langError) {
-        console.error("Language detection error:", langError);
-        // Continue with default language if detection fails
-      }
-
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+      // First, use Gemini to detect the language
+      const languageDetectionPrompt = `Analyze this message and identify the language. Respond with ONLY one of these language codes: 'en' for English, 'hi' for Hindi, or 'mr' for Marathi. If unsure, respond with 'en'.
+
+Message: ${message}`;
+
+      const langDetectionResult = await model.generateContent(languageDetectionPrompt);
+      const langResponse = await langDetectionResult.response;
+      let detectedLanguage = langResponse.text().trim().toLowerCase();
+      
+      // Validate detected language
+      if (!['en', 'hi', 'mr'].includes(detectedLanguage)) {
+        detectedLanguage = 'en'; // Default to English if detection fails
+      }
+
+      console.log('Detected language:', detectedLanguage);
 
       const languageNames = {
         'en': 'English',
