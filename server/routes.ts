@@ -1306,8 +1306,9 @@ export function registerRoutes(app: Express): Server {
       doc.pipe(res);
 
       // Helper function to format currency consistently with proper styling
+      // Amount is already in rupees from database, just format it
       const formatAmount = (amount: number) => {
-        return `₹${Math.floor(amount / 100).toLocaleString('en-IN')}`;
+        return `₹${Math.floor(amount).toLocaleString('en-IN')}`;
       };
 
       // Professional PDF Content Generation
