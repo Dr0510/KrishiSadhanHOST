@@ -316,20 +316,20 @@
     "noResults": "कोई परिणाम नहीं मिला"
   },
   "categories": {
+    "tractors": "ट्रैक्टर",
+    "harvesters": "हार्वेस्टर",
+    "seeders": "सीडर",
+    "sprayers": "स्प्रेयर",
+    "irrigation": "सिंचाई",
     "tractor": "ट्रैक्टर और हार्वेस्टर",
-    "harvesters": "कंबाइन हार्वेस्टर",
+    "harvester": "कंबाइन हार्वेस्टर",
     "seeder": "बीज बोने के उपकरण",
     "plough": "हल और टिलर",
     "sprayer": "छिड़काव उपकरण",
     "cultivator": "कल्टीवेटर",
     "thresher": "थ्रेशर",
     "combine": "कंबाइन उपकरण",
-    "rotavator": "रोटावेटर",
-    "irrigation": "सिंचाई प्रणाली",
-    "tractors": "ट्रैक्टर",
-    "harvesters": "हार्वेस्टर",
-    "seeders": "सीडर",
-    "sprayers": "स्प्रेयर"
+    "rotavator": "रोटावेटर"
   },
   "receipt": {
     "title": "रसीद",

@@ -66,11 +66,11 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 type EquipmentFormData = z.infer<typeof equipmentSchema>;
 
 const categories = [
-  { id: "tractors", label: "Tractors" },
-  { id: "harvesters", label: "Harvesters" },
-  { id: "irrigation", label: "Irrigation" },
-  { id: "seeders", label: "Seeders" },
-  { id: "sprayers", label: "Sprayers" },
+  { id: "tractors", labelKey: "categories.tractors" },
+  { id: "harvesters", labelKey: "categories.harvesters" },
+  { id: "irrigation", labelKey: "categories.irrigation" },
+  { id: "seeders", labelKey: "categories.seeders" },
+  { id: "sprayers", labelKey: "categories.sprayers" },
 ];
 
 export function MainNav() {
@@ -344,7 +344,7 @@ export function MainNav() {
                 {categories.map((category) => (
                   <DropdownMenuItem key={category.id} asChild>
                     <Link href={`/equipment?category=${category.id}`} className="w-full">
-                      {t(`categories.${category.id}`, category.label)}
+                      {t(category.labelKey)}
                     </Link>
                   </DropdownMenuItem>
                 ))}

@@ -92,6 +92,11 @@
     "noResults": "No results found"
   },
   "categories": {
+    "tractors": "Tractors",
+    "harvesters": "Harvesters",
+    "seeders": "Seeders",
+    "sprayers": "Sprayers",
+    "irrigation": "Irrigation",
     "tractor": "Tractors & Harvesters",
     "harvester": "Combine Harvesters",
     "seeder": "Seeding Equipment",
@@ -100,8 +105,7 @@
     "cultivator": "Cultivators",
     "thresher": "Threshers",
     "combine": "Combine Equipment",
-    "rotavator": "Rotavators",
-    "irrigation": "Irrigation Systems"
+    "rotavator": "Rotavators"
   },
   "common": {
     "processing": "Processing...",
