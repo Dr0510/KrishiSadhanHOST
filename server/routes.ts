@@ -794,10 +794,11 @@ export function registerRoutes(app: Express): Server {
       console.log('Creating receipt with metadata...');
 
       // Create receipt with simplified metadata
+      // booking.totalPrice is already in rupees
       const receipt = await storage.createReceipt({
         bookingId: booking.id,
         userId: booking.userId,
-        amount: booking.totalPrice, // Store amount in rupees
+        amount: booking.totalPrice, // Amount in rupees (from booking)
         status: 'paid',
         razorpayPaymentId: razorpay_payment_id,
         metadata: {

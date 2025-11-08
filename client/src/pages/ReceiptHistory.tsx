@@ -39,12 +39,13 @@ const ReceiptHistory = () => {
 
   // Format amount in Indian Rupees with proper formatting
   const formatRupees = (amount: number) => {
-    // Amount is already in rupees
+    // Ensure amount is a number and format properly
+    const numAmount = Number(amount) || 0;
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
       maximumFractionDigits: 0,
-    }).format(amount);
+    }).format(numAmount);
   };
 
   const {

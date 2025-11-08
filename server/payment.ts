@@ -173,15 +173,21 @@ export async function generateReceipt(bookingId: number, paymentId: string) {
     const dailyRate = equipment.dailyRate;
     const totalCalculated = dailyRate * daysRented;
 
+    // Helper function to format currency consistently with proper styling
+    // Amount is already in rupees, just format it
+    const formatAmount = (amount: number) => {
+      return `₹${Math.floor(amount).toLocaleString('en-IN')}`;
+    };
+
     doc.setFont("helvetica", "normal");
-    doc.text(`Daily Rate: ₹${dailyRate.toLocaleString('en-IN')}`, 20, currentY);
+    doc.text(`Daily Rate: ${formatAmount(dailyRate)}`, 20, currentY);
     currentY += lineHeight;
     doc.text(`Rental Period: ${daysRented} day(s)`, 20, currentY);
     currentY += lineHeight;
-    doc.text(`Equipment Rental: ₹${dailyRate.toLocaleString('en-IN')} × ${daysRented} = ₹${totalCalculated.toLocaleString('en-IN')}`, 20, currentY);
+    doc.text(`Equipment Rental: ${formatAmount(dailyRate)} × ${daysRented} = ${formatAmount(totalCalculated)}`, 20, currentY);
     currentY += lineHeight;
     const amountInRupees = booking.totalPrice;
-    doc.text(`Total Amount Paid: ₹${amountInRupees.toLocaleString('en-IN')}`, 20, currentY);
+    doc.text(`Total Amount Paid: ${formatAmount(amountInRupees)}`, 20, currentY);
     doc.text(`Status: ${payment.status.toUpperCase()}`, pageWidth - 60, currentY);
     currentY += lineHeight * 2;
 
