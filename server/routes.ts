@@ -797,7 +797,7 @@ export function registerRoutes(app: Express): Server {
       const receipt = await storage.createReceipt({
         bookingId: booking.id,
         userId: booking.userId,
-        amount: booking.totalPrice * 100, // Amount in paise (multiply by 100 to convert from rupees)
+        amount: booking.totalPrice, // Store amount in rupees
         status: 'paid',
         razorpayPaymentId: razorpay_payment_id,
         metadata: {
@@ -907,7 +907,7 @@ export function registerRoutes(app: Express): Server {
           const newReceipt = await storage.createReceipt({
             bookingId: booking.id,
             userId: booking.userId,
-            amount: booking.totalPrice * 100, // Amount in paise
+            amount: booking.totalPrice, // Store in rupees
             status: 'paid',
             razorpayPaymentId: booking.razorpayPaymentId,
             metadata: {
@@ -1522,8 +1522,7 @@ export function registerRoutes(app: Express): Server {
          .lineWidth(1)
          .stroke('#dee2e6');
 
-      // Fixed amount display with consistent formatting - convert paise to rupees
-      const amountInRupees = receipt.amount / 100;
+      // Fixed amount display with consistent formatting - amount is already in rupees
       doc.font('Helvetica-Bold')
          .fontSize(14)
          .fillColor('#228B22')
@@ -1532,7 +1531,7 @@ export function registerRoutes(app: Express): Server {
       doc.font('Helvetica-Bold')
          .fontSize(14)
          .fillColor('#228B22')
-         .text(formatAmount(amountInRupees), margin + 350, 530);
+         .text(formatAmount(receipt.amount), margin + 350, 530);
 
       // Payment Information
       doc.fillColor('#495057')

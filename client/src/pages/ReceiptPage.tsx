@@ -172,7 +172,7 @@ export default function ReceiptPage() {
                     style: 'currency',
                     currency: receipt.currency || 'INR',
                     maximumFractionDigits: 0
-                  }).format(receipt.amount / 100)}
+                  }).format(receipt.amount)}
                 </span>
               </div>
             </div>
