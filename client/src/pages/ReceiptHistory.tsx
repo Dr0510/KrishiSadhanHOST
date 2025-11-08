@@ -36,9 +36,8 @@ const ReceiptHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // ✅ FIXED: Correct Razorpay amount (paise → rupees)
   const formatRupees = (amount: number) => {
-    const rupees = Number(amount) / 100 || 0; // Razorpay returns amount in paise
+    const rupees = Number(amount) || 0;
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
@@ -66,12 +65,11 @@ const ReceiptHistory = () => {
 
   const filteredReceipts = receipts || [];
 
-  // ✅ FIXED: Divide by 100 when calculating totals
   const analytics = useMemo(() => {
     if (!receipts) return { total: 0, totalAmount: 0, paidCount: 0, pendingCount: 0 };
 
     const total = receipts.length;
-    const totalAmount = receipts.reduce((sum, receipt) => sum + receipt.amount / 100, 0);
+    const totalAmount = receipts.reduce((sum, receipt) => sum + Number(receipt.amount), 0);
     const paidCount = receipts.filter(r => r.status === 'paid').length;
     const pendingCount = receipts.filter(r => r.status === 'pending').length;
 
@@ -206,7 +204,7 @@ const ReceiptHistory = () => {
 
           <Card>
             <CardHeader><CardTitle>Total Amount</CardTitle></CardHeader>
-            <CardContent><div className="text-2xl font-bold text-green-600">{formatRupees(analytics.totalAmount * 100)}</div></CardContent>
+            <CardContent><div className="text-2xl font-bold text-green-600">{formatRupees(analytics.totalAmount)}</div></CardContent>
           </Card>
 
           <Card>

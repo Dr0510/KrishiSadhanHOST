@@ -841,8 +841,7 @@ export function registerRoutes(app: Express): Server {
       // Log receipt amounts for debugging
       console.log('Receipt amounts:', receipts.map(r => ({
         id: r.id,
-        amount: r.amount,
-        amountInRupees: r.amount / 100
+        amountInRupees: r.amount
       })));
 
       res.json(receipts.map(receipt => ({
