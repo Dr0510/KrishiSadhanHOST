@@ -80,6 +80,7 @@ export function Chatbot() {
 
   const fetchGeminiResponse = async (userMessage: string) => {
     try {
+      console.log('Sending message to chatbot API:', userMessage);
       const response = await fetch('/api/chatbot', {
         method: 'POST',
         headers: {
@@ -89,11 +90,13 @@ export function Chatbot() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({ error: 'Network error' }));
+        console.error('Chatbot API error:', errorData);
         throw new Error(errorData.error || 'Failed to get AI response');
       }
 
       const data = await response.json();
+      console.log('Received chatbot response:', data);
       return data.response;
     } catch (error) {
       console.error('Error fetching Gemini response:', error);
@@ -147,9 +150,19 @@ export function Chatbot() {
       addMessage(response, 'bot');
     } catch (error) {
       console.error('Chat error:', error);
-      // Add error message to chat
+      // Add specific error message to chat
+      let errorText = t('chatbot.error', "I'm sorry, but I'm having trouble connecting right now. Please try again later or contact our support team for immediate assistance.");
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Network')) {
+          errorText = "Network error: Please check your internet connection and try again.";
+        } else if (error.message.includes('API key')) {
+          errorText = "Configuration error: The AI service needs to be set up. Please contact support.";
+        }
+      }
+      
       const errorMessage: Message = {
-        content: t('chatbot.error', "I'm sorry, but I'm having trouble connecting right now. Please try again later or contact our support team for immediate assistance."),
+        content: errorText,
         sender: 'bot',
         timestamp: new Date()
       };

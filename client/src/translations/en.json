@@ -299,7 +299,14 @@
     "selected": "Selected"
   },
   "booking": {
-    "selectDates": "Select Rental Dates",
+    "title": "Book Equipment",
+    "selectDates": "Select Booking Dates",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "totalCost": "Total Cost",
+    "bookNow": "Book Now",
+    "rentNow": "Rent Now",
+    "confirm": "Confirm Booking",
     "selectDatesDescription": "Choose your start and end dates for renting this equipment.",
     "missingInfo": "Missing booking information",
     "invalidDateRange": "End date must be after start date",
