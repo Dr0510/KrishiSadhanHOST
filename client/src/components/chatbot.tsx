@@ -33,7 +33,10 @@ export function Chatbot() {
     t('chatbot.suggestions.pricing', 'What are the rental prices?'),
     t('chatbot.suggestions.availability', 'Check equipment availability'),
     'Contact via WhatsApp',
-    'Share equipment list'
+    'Share equipment list',
+    // Multi-language examples
+    'मुझे ट्रैक्टर चाहिए', // Hindi: I need a tractor
+    'मला उपकरणे भाड्याने हवी आहेत' // Marathi: I need equipment for rent
   ];
 
   // WhatsApp integration function
@@ -97,6 +100,7 @@ export function Chatbot() {
 
       const data = await response.json();
       console.log('Received chatbot response:', data);
+      console.log('Detected language:', data.detectedLanguage);
       return data.response;
     } catch (error) {
       console.error('Error fetching Gemini response:', error);

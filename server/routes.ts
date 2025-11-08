@@ -13,6 +13,7 @@ import { createPaymentSession, verifyPaymentSignature, generateReceipt } from ".
 import crypto from 'crypto';
 import PDFDocument from 'pdfkit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import languageDetector from 'langdetect';
 
 // Configure cloudinary
 import { v2 as cloudinary } from 'cloudinary';
@@ -1504,7 +1505,7 @@ export function registerRoutes(app: Express): Server {
       doc.font('Helvetica')
          .fontSize(10)
          .text('Equipment Rental', margin + 10, 485);
-      
+
       doc.fontSize(10)
          .text(formatAmount(equipment.dailyRate), margin + 200, 485)
          .text(`${rentalDays}`, margin + 280, 485)
@@ -1527,7 +1528,7 @@ export function registerRoutes(app: Express): Server {
          .fontSize(14)
          .fillColor('#228B22')
          .text('Total Amount Paid:', margin + 10, 530);
-      
+
       doc.font('Helvetica-Bold')
          .fontSize(14)
          .fillColor('#228B22')
@@ -1656,11 +1657,34 @@ export function registerRoutes(app: Express): Server {
         return res.status(500).json({ error: 'Google AI API key not configured' });
       }
 
+      // Detect language
+      let detectedLanguage = 'en'; // Default to English
+      try {
+        const detected = languageDetector.detect(message);
+        if (detected && detected.length > 0) {
+          detectedLanguage = detected[0].lang;
+        }
+      } catch (langError) {
+        console.error("Language detection error:", langError);
+        // Continue with default language if detection fails
+      }
+
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-      // Create a comprehensive system prompt for farm equipment rental context
-      const systemPrompt = `You are a helpful farm equipment rental assistant for KrishiSadhan, an agricultural equipment rental platform. You help farmers and agricultural workers with:
+      const languageNames = {
+        'en': 'English',
+        'hi': 'Hindi',
+        'mr': 'Marathi'
+      };
+
+      const languageInstructions = {
+        'en': 'Respond in English.',
+        'hi': 'उपयोगकर्ता ने हिंदी में सवाल पूछा है। कृपया हिंदी में जवाब दें।',
+        'mr': 'वापरकर्त्याने मराठीत प्रश्न विचारला आहे. कृपया मराठीत उत्तर द्या।'
+      };
+
+      const prompt = `You are a helpful farm equipment rental assistant for KrishiSadhan, an agricultural equipment rental platform. You help farmers and agricultural workers with:
 
 MAIN SERVICES:
 - Finding suitable farm equipment for rent (tractors, harvesters, tillers, sprayers, seeders, cultivators, threshers, irrigation systems, rotavators)
@@ -1685,13 +1709,20 @@ GUIDELINES:
 - Use simple language appropriate for farmers
 - If asked about pricing, mention that rates vary by equipment and location
 
-User message: ${message}`;
+IMPORTANT: The user's message is in ${languageNames[detectedLanguage]}. ${languageInstructions[detectedLanguage]}
+You MUST respond in the SAME language as the user's question.
 
-      const result = await model.generateContent(systemPrompt);
+User question: ${message}`;
+
+      const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
 
-      res.json({ response: text });
+      // Return response with detected language
+      res.json({ 
+        response: text,
+        detectedLanguage: detectedLanguage
+      });
     } catch (error) {
       console.error('Gemini API error:', error);
 
@@ -1704,6 +1735,8 @@ User message: ${message}`;
           errorMessage = 'AI service quota reached. Please try again later.';
         } else if (error.message.includes('API key')) {
           errorMessage = 'AI service configuration issue. Please contact support.';
+        } else {
+          errorMessage = error.message;
         }
       }
 
