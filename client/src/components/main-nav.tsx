@@ -315,7 +315,11 @@ export function MainNav() {
 
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2">
-              <Tractor className="h-7 w-7 text-green-600" />
+              <img 
+                src="https://drive.google.com/uc?export=view&id=1M3Lw-_es7GWYIJxUlatA61uapm38ywCd" 
+                alt="KrishiSadhan Logo" 
+                className="h-7 w-7 object-contain"
+              />
               <span className="text-2xl font-bold bg-gradient-to-r from-green-700 to-green-500 bg-clip-text text-transparent font-serif tracking-wide">
                 {t('branding.name', 'KrishiSadhan')}
               </span>
