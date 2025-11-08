@@ -1382,24 +1382,24 @@ export function registerRoutes(app: Express): Server {
          .fillColor('#C8E6C9')
          .text('Empowering Farmers | Building Communities', logoX + 70, 72);
 
-      // Company details box on the right
+      // Company details box on the right with better visibility
       const rightBoxX = pageWidth - 180;
       doc.rect(rightBoxX, 20, 160, 70)
-         .fillAndStroke('#FFFFFF15', '#FFFFFF40')
-         .lineWidth(1);
+         .fillAndStroke('#FFFFFF', '#FFD700')
+         .lineWidth(2);
 
       doc.font('Helvetica-Bold')
          .fontSize(9)
-         .fillColor('#FFFFFF')
+         .fillColor('#1a5f1a')
          .text('Contact Us', rightBoxX + 10, 28);
 
       doc.font('Helvetica')
          .fontSize(8)
-         .fillColor('#E8F5E9')
-         .text('🌐 www.krishisadhan.shop', rightBoxX + 10, 42)
-         .text('📧 support@krishisadhan.shop', rightBoxX + 10, 54)
-         .text('📞 +91-7385688905', rightBoxX + 10, 66)
-         .text('📍 Maharashtra, India', rightBoxX + 10, 78);
+         .fillColor('#333333')
+         .text('Web: www.krishisadhan.shop', rightBoxX + 10, 42)
+         .text('Email: support@krishisadhan.shop', rightBoxX + 10, 54)
+         .text('Phone: +91-7385688905', rightBoxX + 10, 66)
+         .text('Location: Maharashtra, India', rightBoxX + 10, 78);
 
       // ==================== RECEIPT TITLE SECTION ====================
       // Decorative line
@@ -1684,7 +1684,7 @@ export function registerRoutes(app: Express): Server {
 
       doc.fontSize(8)
          .fillColor('#C8E6C9')
-         .text('📧 support@krishisadhan.shop  |  📞 +91-7385688905  |  🌐 www.krishisadhan.shop', 0, pageHeight - 22, { 
+         .text('Email: support@krishisadhan.shop  |  Phone: +91-7385688905  |  Web: www.krishisadhan.shop', 0, pageHeight - 22, { 
            align: 'center', 
            width: pageWidth 
          });
