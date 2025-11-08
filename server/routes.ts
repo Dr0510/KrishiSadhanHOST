@@ -1522,7 +1522,8 @@ export function registerRoutes(app: Express): Server {
          .lineWidth(1)
          .stroke('#dee2e6');
 
-      // Fixed amount display with consistent formatting
+      // Fixed amount display with consistent formatting - convert paise to rupees
+      const amountInRupees = receipt.amount / 100;
       doc.font('Helvetica-Bold')
          .fontSize(14)
          .fillColor('#228B22')
@@ -1531,7 +1532,7 @@ export function registerRoutes(app: Express): Server {
       doc.font('Helvetica-Bold')
          .fontSize(14)
          .fillColor('#228B22')
-         .text(formatAmount(receipt.amount), margin + 350, 530);
+         .text(formatAmount(amountInRupees), margin + 350, 530);
 
       // Payment Information
       doc.fillColor('#495057')

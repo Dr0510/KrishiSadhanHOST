@@ -38,10 +38,14 @@ const ReceiptHistory = () => {
   const [statusFilter, setStatusFilter] = useState("all");
 
   // Format amount in Indian Rupees with proper formatting
-  const formatRupees = (amount: number): string => {
-    // Ensure amount is a valid number
-    const numAmount = Number(amount) || 0;
-    return `₹${numAmount.toLocaleString('en-IN')}`;
+  const formatRupees = (amount: number) => {
+    // Convert paise to rupees before formatting
+    const amountInRupees = amount / 100;
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amountInRupees);
   };
 
   const {
@@ -68,12 +72,12 @@ const ReceiptHistory = () => {
   // Calculate analytics
   const analytics = useMemo(() => {
     if (!receipts) return { total: 0, totalAmount: 0, paidCount: 0, pendingCount: 0 };
-    
+
     const total = receipts.length;
     const totalAmount = receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
     const paidCount = receipts.filter(r => r.status === 'paid').length;
     const pendingCount = receipts.filter(r => r.status === 'pending').length;
-    
+
     return { total, totalAmount, paidCount, pendingCount };
   }, [receipts]);
 
@@ -235,7 +239,7 @@ const ReceiptHistory = () => {
               <div className="text-2xl font-bold">{analytics.total}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
@@ -245,7 +249,7 @@ const ReceiptHistory = () => {
               <div className="text-2xl font-bold text-green-600">{formatRupees(analytics.totalAmount)}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Paid</CardTitle>
@@ -255,7 +259,7 @@ const ReceiptHistory = () => {
               <div className="text-2xl font-bold text-green-600">{analytics.paidCount}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Pending</CardTitle>
@@ -379,7 +383,7 @@ const ReceiptHistory = () => {
                                   </p>
                                 </div>
                               </div>
-                              
+
                               <div>
                                 <h4 className="font-semibold text-sm">Booking Period</h4>
                                 <p className="text-sm text-muted-foreground">
@@ -388,7 +392,7 @@ const ReceiptHistory = () => {
                                   ) : "N/A"}
                                 </p>
                               </div>
-                              
+
                               <div className="border-t pt-4">
                                 <h4 className="font-semibold text-sm mb-2">Rental Calculation</h4>
                                 <div className="space-y-2 text-sm">
@@ -397,7 +401,8 @@ const ReceiptHistory = () => {
                                       const startDate = new Date(receipt.metadata.booking_dates.start);
                                       const endDate = new Date(receipt.metadata.booking_dates.end);
                                       const daysRented = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-                                      const dailyRate = Math.round(receipt.amount / daysRented);
+                                      // Ensure dailyRate calculation handles potential division by zero or near-zero
+                                      const dailyRate = daysRented > 0 ? Math.round(receipt.amount / daysRented) : receipt.amount;
                                       return (
                                         <>
                                           <div className="flex justify-between">
@@ -428,21 +433,21 @@ const ReceiptHistory = () => {
                                   })()}
                                 </div>
                               </div>
-                              
+
                               <div>
                                 <h4 className="font-semibold text-sm">Payment Method</h4>
                                 <p className="text-sm text-muted-foreground">
                                   {receipt.metadata?.payment_method || "Online Payment"}
                                 </p>
                               </div>
-                              
+
                               <div>
                                 <h4 className="font-semibold text-sm">Status</h4>
                                 <Badge className={getStatusInfo(receipt.status).className}>
                                   {getStatusInfo(receipt.status).text}
                                 </Badge>
                               </div>
-                              
+
                               <div>
                                 <h4 className="font-semibold text-sm">Generated On</h4>
                                 <p className="text-sm text-muted-foreground">
@@ -452,7 +457,7 @@ const ReceiptHistory = () => {
                             </div>
                           </DialogContent>
                         </Dialog>
-                        
+
                         <Button
                           variant="outline"
                           size="sm"

@@ -168,7 +168,7 @@ export default function ReceiptPage() {
               <div className="flex justify-between items-center text-xl font-semibold">
                 <span>{t('receipt.totalAmount', 'Total Amount')}</span>
                 <span>
-                  {new Intl.NumberFormat('hi-IN', {
+                  {new Intl.NumberFormat('en-IN', {
                     style: 'currency',
                     currency: receipt.currency || 'INR',
                     maximumFractionDigits: 0

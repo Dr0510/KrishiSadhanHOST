@@ -180,7 +180,8 @@ export async function generateReceipt(bookingId: number, paymentId: string) {
     currentY += lineHeight;
     doc.text(`Equipment Rental: ₹${dailyRate.toLocaleString('en-IN')} × ${daysRented} = ₹${totalCalculated.toLocaleString('en-IN')}`, 20, currentY);
     currentY += lineHeight;
-    doc.text(`Total Amount Paid: ₹${booking.totalPrice.toLocaleString('en-IN')}`, 20, currentY);
+    const amountInRupees = booking.totalPrice;
+    doc.text(`Total Amount Paid: ₹${amountInRupees.toLocaleString('en-IN')}`, 20, currentY);
     doc.text(`Status: ${payment.status.toUpperCase()}`, pageWidth - 60, currentY);
     currentY += lineHeight * 2;
 
@@ -193,11 +194,11 @@ export async function generateReceipt(bookingId: number, paymentId: string) {
     const pdfBuffer = doc.output('arraybuffer');
     const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
 
-    // Create receipt record in database - use booking total price for consistency
+    // Create receipt record in database - store amount in paise for consistency
     const receiptData = {
       bookingId,
       userId: booking.userId,
-      amount: booking.totalPrice, // Use booking amount in rupees for consistency
+      amount: booking.totalPrice * 100, // Convert rupees to paise for storage
       status: payment.status,
       razorpayPaymentId: paymentId,
       pdfUrl: `data:application/pdf;base64,${pdfBase64}`,
