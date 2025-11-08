@@ -65,6 +65,34 @@ export default function HomePage() {
 
   const allEquipment = equipment || [];
 
+  // Payment gateway configuration with updated business name
+  const paymentGatewayConfig = {
+    key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+    amount: 50000, // Example amount
+    currency: "INR",
+    name: "KrishiSadhan", // ✅ New business name (shows on Razorpay checkout)
+    description: `Smart Farm Equipment Rental – ${allEquipment.length > 0 ? allEquipment[0].name : 'Equipment'}`, // Dynamic description
+    handler: function (response: any) {
+      toast({
+        title: "Payment Successful",
+        description: `Payment ID: ${response.razorpay_payment_id}`,
+        variant: "success",
+      });
+    },
+    prefill: {
+      name: "Customer Name", // Replace with actual customer name
+      email: "customer@example.com", // Replace with actual customer email
+      contact: "9000000000", // Replace with actual customer contact
+    },
+    notes: {
+      address: "KrishiSadhan Office, India", // Replace with actual address if needed
+    },
+    theme: {
+      color: "#65A30D", // Primary color
+    },
+  };
+
+
   return (
     <div>
       <MainNav />
