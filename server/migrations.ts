@@ -80,6 +80,18 @@ async function createTables() {
         reason TEXT NOT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT NOW()
       );
+
+      CREATE TABLE IF NOT EXISTS receipts (
+        id SERIAL PRIMARY KEY,
+        booking_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        amount INTEGER NOT NULL,
+        status TEXT NOT NULL,
+        generated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        pdf_url TEXT,
+        razorpay_payment_id TEXT,
+        metadata JSONB NOT NULL DEFAULT '{}'
+      );
     `);
 
     console.log('Database tables created successfully');
