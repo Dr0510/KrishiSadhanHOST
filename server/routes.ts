@@ -1607,10 +1607,6 @@ export function registerRoutes(app: Express): Server {
          .stroke();
 
       // Table rows
-      const baseAmount = equipment.dailyRate * rentalDays;
-      const gstRate = 18;
-      const gstAmount = Math.round(baseAmount * (gstRate / 100));
-
       yPos = 615;
       doc.font('Helvetica')
          .fontSize(10)
@@ -1619,16 +1615,13 @@ export function registerRoutes(app: Express): Server {
          .text(formatAmount(equipment.dailyRate), margin + 240, yPos)
          .text(`${rentalDays}`, margin + 340, yPos)
          .font('Helvetica-Bold')
-         .text(formatAmount(baseAmount), margin + 420, yPos);
+         .text(formatAmount(receipt.amount), margin + 420, yPos);
 
       yPos += 25;
       doc.font('Helvetica')
-         .fillColor('#333333')
-         .text(`GST (${gstRate}%)`, margin + 15, yPos)
-         .text('—', margin + 240, yPos)
-         .text('—', margin + 340, yPos)
-         .font('Helvetica-Bold')
-         .text(formatAmount(gstAmount), margin + 420, yPos);
+         .fontSize(8)
+         .fillColor('#666666')
+         .text('(All taxes included)', margin + 15, yPos);
 
       // Total section
       doc.rect(margin, 665, contentWidth, 30)
@@ -1661,6 +1654,15 @@ export function registerRoutes(app: Express): Server {
          .text(`Method: ${receipt.metadata.payment_method || 'Online Payment'}`, margin + 15, 747)
          .text(`Date: ${format(receipt.generatedAt, 'dd MMM yyyy, hh:mm a')}`, margin + 280, 735)
          .text('Status: Secured & Verified ✓', margin + 280, 747);
+
+      // Tax inclusive note
+      doc.font('Helvetica-Bold')
+         .fontSize(7)
+         .fillColor('#228B22')
+         .text('* All applicable taxes are included in the total amount', margin + 15, 765, {
+           width: contentWidth - 30,
+           align: 'center'
+         });
 
       // ==================== FOOTER ====================
       doc.rect(0, pageHeight - 70, pageWidth, 70)
