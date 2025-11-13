@@ -199,84 +199,100 @@ export function registerRoutes(app: Express): Server {
         'nilanga': [18.1177, 76.7506],
         'aurangabad': [19.8762, 75.3433],
         'chh. sambhajinagar': [19.8762, 75.3433],
+        'chhatapati sambhajinagar': [19.8762, 75.3433],
         'nagpur': [21.1458, 79.0882],
         'nashik': [19.9975, 73.7898],
         'barshi': [18.2333, 75.6833],
+        'barshi-dhanur': [18.2333, 75.6833],
+        'jalna': [19.8414, 75.8837],
+        'udgir': [18.3932, 77.1166],
+        'paithan': [19.4787, 75.3831],
+        'agra': [27.1767, 78.0081],
       };
 
       // Clean and format location string
       const location = req.body.location?.toLowerCase().trim();
 
       // Handle custom coordinates if provided
-      let coordinates = null;
+      let coordinates: number[] | null = null;
 
-      // First check if direct coordinates were provided
+      // PRIORITY 1: Direct coordinates from form (GPS or map selection)
       if (req.body.latitudeCoord && req.body.longitudeCoord) {
         const lat = parseFloat(req.body.latitudeCoord);
         const lng = parseFloat(req.body.longitudeCoord);
         if (!isNaN(lat) && !isNaN(lng)) {
           coordinates = [lat, lng];
-          console.log('Using custom coordinates from form:', coordinates);
+          console.log('✓ Using GPS coordinates from form:', coordinates);
         }
       }
 
-      // If no direct coordinates, try to find from city map
+      // PRIORITY 2: Try to find from city map
       if (!coordinates && location) {
-        // Normalize location for comparison
         const normalizedLocation = location.toLowerCase().trim();
 
-        // Try different location formats in the city map
-        coordinates = cityCoordinates[normalizedLocation] || 
-                      cityCoordinates[normalizedLocation.replace('.', '')] || // Try without period
-                      cityCoordinates[normalizedLocation.replace(' ', '')] || // Try without space
-                      null;
+        // Direct match first
+        coordinates = cityCoordinates[normalizedLocation];
 
         if (coordinates) {
-          console.log('Found coordinates for location:', location, coordinates);
+          console.log('✓ Found exact city match:', location, coordinates);
         } else {
-          console.log('No coordinates found for location:', location);
+          // Try variations (without periods, spaces, hyphens)
+          const variations = [
+            normalizedLocation.replace(/[.\s-]/g, ''),
+            normalizedLocation.replace('.', ''),
+            normalizedLocation.replace(' ', ''),
+            normalizedLocation.replace('-', ''),
+          ];
 
-          // If location is provided but no coordinates found, try more thorough matching
-          if (location && location.length > 0) {
-            // Try a fuzzy match with cityCoordinates keys
-            let bestMatch = '';
-            let maxSimilarity = 0;
-
-            Object.keys(cityCoordinates).forEach(city => {
-              // Check if location contains city name or vice versa
-              if (city.includes(normalizedLocation) || normalizedLocation.includes(city)) {
-                const similarity = Math.min(city.length, normalizedLocation.length) / 
-                                  Math.max(city.length, normalizedLocation.length);
-                if (similarity > maxSimilarity) {
-                  maxSimilarity = similarity;
-                  bestMatch = city;
-                }
-              }
-            });
-
-            if (bestMatch && maxSimilarity > 0.5) {
-              coordinates = cityCoordinates[bestMatch];
-              console.log(`Found fuzzy match for "${location}": "${bestMatch}"`, coordinates);
-            } else {
-              // Split location by commas and check each part
-              const locationParts = normalizedLocation.split(',');
-              for (const part of locationParts) {
-                const trimmedPart = part.trim();
-                if (cityCoordinates[trimmedPart]) {
-                  coordinates = cityCoordinates[trimmedPart];
-                  console.log(`Found coordinates for location part "${trimmedPart}"`, coordinates);
-                  break;
-                }
-              }
-
-              // If still no coordinates, use default
-              if (!coordinates) {
-                coordinates = [20.5937, 78.9629]; // Default to center of India
-                console.log('Using default coordinates for unknown location:', location);
-              }
+          for (const variation of variations) {
+            if (cityCoordinates[variation]) {
+              coordinates = cityCoordinates[variation];
+              console.log('✓ Found city match with variation:', variation, coordinates);
+              break;
             }
           }
         }
+
+        // PRIORITY 3: Fuzzy matching
+        if (!coordinates) {
+          let bestMatch = '';
+          let maxSimilarity = 0;
+
+          Object.keys(cityCoordinates).forEach(city => {
+            if (city.includes(normalizedLocation) || normalizedLocation.includes(city)) {
+              const similarity = Math.min(city.length, normalizedLocation.length) / 
+                                Math.max(city.length, normalizedLocation.length);
+              if (similarity > maxSimilarity) {
+                maxSimilarity = similarity;
+                bestMatch = city;
+              }
+            }
+          });
+
+          if (bestMatch && maxSimilarity > 0.4) {
+            coordinates = cityCoordinates[bestMatch];
+            console.log(`✓ Found fuzzy match for "${location}": "${bestMatch}"`, coordinates);
+          }
+        }
+
+        // PRIORITY 4: Try splitting by comma
+        if (!coordinates && normalizedLocation.includes(',')) {
+          const parts = normalizedLocation.split(',');
+          for (const part of parts) {
+            const trimmedPart = part.trim();
+            if (cityCoordinates[trimmedPart]) {
+              coordinates = cityCoordinates[trimmedPart];
+              console.log(`✓ Found match in location parts: "${trimmedPart}"`, coordinates);
+              break;
+            }
+          }
+        }
+      }
+
+      // PRIORITY 5: Default to center of India if still no coordinates
+      if (!coordinates) {
+        coordinates = [20.5937, 78.9629];
+        console.log('⚠ Using default India coordinates for:', location);
       }
 
       const equipmentData = {
@@ -1319,7 +1335,7 @@ export function registerRoutes(app: Express): Server {
       // Gradient-style header background (simulated with rectangles)
       doc.rect(0, 0, pageWidth, 120)
          .fill('#1a5f1a');
-      
+
       doc.rect(0, 0, pageWidth, 100)
          .fill('#228B22');
 
@@ -1335,7 +1351,7 @@ export function registerRoutes(app: Express): Server {
       // Logo outer circle with shadow effect
       doc.circle(logoX + logoSize/2, logoY + logoSize/2 + 2, logoSize/2)
          .fill('#00000020');
-      
+
       // Logo background circle
       doc.circle(logoX + logoSize/2, logoY + logoSize/2, logoSize/2)
          .fillAndStroke('#FFFFFF', '#FFD700')
@@ -1343,25 +1359,25 @@ export function registerRoutes(app: Express): Server {
 
       // Tractor icon design
       doc.fillColor('#228B22');
-      
+
       // Tractor body
       doc.rect(logoX + 10, logoY + 25, 28, 10)
          .fill();
-      
+
       // Tractor cabin
       doc.rect(logoX + 24, logoY + 15, 14, 10)
          .fill();
-      
+
       // Large rear wheel
       doc.circle(logoX + 34, logoY + 40, 7)
          .fillAndStroke('#228B22', '#FFD700')
          .lineWidth(2);
-      
+
       // Small front wheel
       doc.circle(logoX + 14, logoY + 40, 5)
          .fillAndStroke('#228B22', '#FFD700')
          .lineWidth(2);
-      
+
       // Exhaust pipe
       doc.rect(logoX + 32, logoY + 10, 3, 5)
          .fill('#228B22');
@@ -1794,7 +1810,7 @@ Message: ${message}`;
       const langDetectionResult = await model.generateContent(languageDetectionPrompt);
       const langResponse = await langDetectionResult.response;
       let detectedLanguage = langResponse.text().trim().toLowerCase();
-      
+
       // Validate detected language
       if (!['en', 'hi', 'mr'].includes(detectedLanguage)) {
         detectedLanguage = 'en'; // Default to English if detection fails
