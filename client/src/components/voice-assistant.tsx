@@ -1,5 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff, Volume2, AlertCircle, Loader2, HelpCircle } from "lucide-react";
+import {
+  Mic,
+  MicOff,
+  Volume2,
+  AlertCircle,
+  Loader2,
+  HelpCircle,
+} from "lucide-react";
 import { useVoiceAssistant } from "@/hooks/use-voice-assistant";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -9,18 +16,36 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
-import { useState, useCallback, useEffect } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useState, useCallback, useEffect, memo } from "react";
 import { cn } from "@/lib/utils";
 
 interface VoiceAssistantProps {
   onCommand: (command: string) => void;
   className?: string;
 }
+
+// Mic waveform animation (unchanged)
+const WaveformAnimation = memo(() => (
+  <div className="flex items-center gap-1" aria-hidden="true">
+    {[0, 100, 200, 300, 400].map((delay, index) => (
+      <span
+        key={index}
+        className={cn(
+          "w-1 rounded-full bg-blue-500 animate-pulse",
+          index === 2
+            ? "h-8 bg-blue-600"
+            : index === 1 || index === 3
+              ? "h-6"
+              : "h-4",
+        )}
+        style={{ animationDelay: `${delay}ms`, animationDuration: "1s" }}
+      />
+    ))}
+  </div>
+));
+
+WaveformAnimation.displayName = "WaveformAnimation";
 
 export function VoiceAssistant({ onCommand, className }: VoiceAssistantProps) {
   const { t, i18n } = useTranslation();
@@ -38,146 +63,118 @@ export function VoiceAssistant({ onCommand, className }: VoiceAssistantProps) {
     isMicrophoneAvailable,
     speak,
   } = useVoiceAssistant({
-    onCommand,
+    onCommand: (cmd) => {
+      if (cmd === "book now") {
+        speak(t("voice.bookingStarted")); // ✅ FIXED: Marathi/Hindi/English speaking here
+      }
+      if (cmd === "close") {
+        speak(t("voice.dialogClosed"));
+      }
+      if (cmd === "confirm booking") {
+        speak(t("voice.bookingConfirmed"));
+      }
+
+      onCommand(cmd); // keep original parent function call
+    },
   });
 
-  // Reset error state when language changes
   useEffect(() => {
     setRecognitionError(null);
   }, [i18n.language]);
 
-  // Debug logging for voice assistant state
-  useEffect(() => {
-    console.debug('Voice Assistant Status:', {
-      isInitializing,
-      browserSupport: browserSupportsSpeechRecognition,
-      microphoneAvailable: isMicrophoneAvailable,
-      isListening,
-      isSpeaking,
-      error: voiceError,
-      currentLanguage: i18n.language,
-      recognitionError
-    });
-  }, [
-    isInitializing,
-    browserSupportsSpeechRecognition,
-    isMicrophoneAvailable,
-    isListening,
-    isSpeaking,
-    voiceError,
-    i18n.language,
-    recognitionError
-  ]);
-
   const toggleListening = useCallback(async () => {
+    if (isInitializing) return;
+
     try {
       setRecognitionError(null);
 
       if (isListening) {
-        console.debug('Stopping voice assistant...');
         stopListening();
       } else {
-        console.debug('Starting voice assistant...');
         setIsInitializing(true);
         await startListening();
-        speak(t('voice.listening'));
+        speak(t("voice.listening"));
       }
     } catch (error) {
-      console.error('Error toggling voice recognition:', error);
-      setRecognitionError(error instanceof Error ? error.message : t('voice.startError'));
+      console.error("Error toggling voice recognition:", error);
+      setRecognitionError(
+        error instanceof Error ? error.message : t("voice.startError"),
+      );
     } finally {
       setIsInitializing(false);
     }
-  }, [isListening, startListening, stopListening, speak, t]);
+  }, [isListening, startListening, stopListening, speak, t, isInitializing]);
 
   if (!browserSupportsSpeechRecognition) {
-    console.warn('Browser does not support speech recognition');
     return (
       <Alert variant="destructive" className="max-w-md">
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>{t('common.error')}</AlertTitle>
-        <AlertDescription>
-          {t('voice.unsupported')}
-        </AlertDescription>
+        <AlertDescription>{t("voice.unsupported")}</AlertDescription>
       </Alert>
     );
   }
 
   if (!isMicrophoneAvailable) {
-    console.warn('Microphone is not available');
     return (
       <Alert variant="destructive" className="max-w-md">
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>{t('common.error')}</AlertTitle>
-        <AlertDescription>
-          {t('voice.noMicrophone')}
-        </AlertDescription>
+        <AlertDescription>{t("voice.noMicrophone")}</AlertDescription>
       </Alert>
     );
   }
 
   return (
     <TooltipProvider>
-      <div className={cn("flex flex-col items-start gap-2", className)}>
+      <div className={cn("flex flex-col items-start gap-3", className)}>
         <div className="flex items-center gap-3">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant={isListening ? "default" : "outline"}
-                size="icon"
-                onClick={toggleListening}
-                disabled={isInitializing}
-                className={cn(
-                  "transition-all duration-300",
-                  isListening && "animate-pulse ring-2 ring-primary ring-offset-2",
-                  !isListening && "hover:bg-primary/10",
-                  (voiceError || recognitionError) && "ring-2 ring-destructive"
-                )}
-                aria-label={isListening ? t('voice.stopListening') : t('voice.startListening')}
-              >
-                {isInitializing ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : isListening ? (
-                  <Mic className="h-4 w-4 animate-bounce" aria-hidden="true" />
-                ) : (
-                  <MicOff className="h-4 w-4" aria-hidden="true" />
-                )}
-              </Button>
+              <div className="relative group">
+                <Button
+                  variant={isListening ? "default" : "outline"}
+                  size="icon"
+                  onClick={toggleListening}
+                  disabled={isInitializing}
+                  className={cn(
+                    "relative h-14 w-14 rounded-full transition-all duration-300 ease-out",
+                    isListening && "bg-blue-600 scale-110 shadow-xl",
+                    !isListening &&
+                      "hover:bg-blue-50 hover:scale-105 shadow-md",
+                  )}
+                >
+                  {isInitializing ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : isListening ? (
+                    <Mic className="h-6 w-6 text-white" />
+                  ) : (
+                    <MicOff className="h-6 w-6 text-blue-600" />
+                  )}
+                </Button>
+              </div>
             </TooltipTrigger>
-            <TooltipContent side="right" className="flex items-center gap-2">
-              <HelpCircle className="h-4 w-4" aria-hidden="true" />
-              <p>{t('voice.commandHelp')}</p>
+            <TooltipContent side="right">
+              {t("voice.commandHelp")}
             </TooltipContent>
           </Tooltip>
 
           {isListening && (
-            <Badge 
-              variant="secondary"
-              className="animate-pulse flex items-center gap-2 max-w-xs truncate"
-              role="status"
-              aria-live="polite"
-            >
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-ping" aria-hidden="true" />
-              <span className="truncate">{transcript || t('voice.listening')}</span>
+            <Badge className="px-5 py-3 rounded-full bg-blue-100 shadow">
+              <WaveformAnimation />
+              <span>{transcript || t("voice.listening")}</span>
             </Badge>
           )}
 
           {isSpeaking && (
-            <Badge 
-              variant="secondary"
-              className="flex items-center gap-2"
-              role="status"
-              aria-live="polite"
-            >
-              <Volume2 className="h-4 w-4 animate-pulse" aria-hidden="true" />
-              {t('voice.speaking')}
+            <Badge className="px-5 py-3 rounded-full bg-green-100 shadow">
+              <Volume2 className="h-5 w-5" />
+              <span>{t("voice.speaking")}</span>
             </Badge>
           )}
         </div>
 
         {(voiceError || recognitionError) && (
-          <Alert variant="destructive" className="mt-2 max-w-md" role="alert">
-            <AlertCircle className="h-4 w-4" aria-hidden="true" />
+          <Alert variant="destructive" className="max-w-md mt-2">
+            <AlertCircle className="h-5 w-5 text-red-600" />
             <AlertDescription>
               {voiceError || recognitionError}
             </AlertDescription>
