@@ -40,6 +40,16 @@ createTables().catch((err) => {
     const server = registerRoutes(app);
     await setupAuth(app);
 
+    // Loader.io verification route
+    app.get(
+      "/loaderio-03a7f23819f71790aba2bbf29310cd29.txt",
+      (_req: Request, res: Response) => {
+        res
+          .type("text/plain")
+          .send("loaderio-03a7f23819f71790aba2bbf29310cd29");
+      },
+    );
+
     // Configure server timeouts
     server.keepAliveTimeout = 120000; // 2 minutes
     server.headersTimeout = 121000; // Slightly higher than keepAliveTimeout
